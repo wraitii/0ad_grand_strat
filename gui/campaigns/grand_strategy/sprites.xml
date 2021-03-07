@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sprites>
+
+	<sprite name="panelShader">
+		<image texture="session/panel_shader.png"
+			size="0 0 100% 100%"
+		/>
+	</sprite>
+
+	<sprite name="campaignBackground">
+
+		<!-- background -->
+		<image backcolor = "12 12 12"/>
+		<image texture = "global/modern/background.png"
+			texture_size = "0 0 1024 1024"
+			size = "0 0 100% 100%"
+		/>
+
+		<!-- shading -->
+		<!-- we just mirror the same texture on the top and bottom -->
+		<image texture = "global/modern/shadow-high.png"
+			texture_size = "0 0 1024 256"
+			size = "0 100%-256 100% 100%"
+		/>
+		<image texture = "global/modern/shadow-high.png"
+			texture_size = "1024 256 0 0"
+			size = "0 0 100% 256"
+		/>
+	</sprite>
+
+</sprites>

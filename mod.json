@@ -1,0 +1,8 @@
+{
+	"name": "grand_strategy",
+	"version": "0.0.0",
+	"label": "Grand Strategy",
+	"url": "github.com/wraitii/ui_mod",
+	"description": "Some UX improvements tests",
+	"dependencies": ["0ad>=0.0.24"]
+}

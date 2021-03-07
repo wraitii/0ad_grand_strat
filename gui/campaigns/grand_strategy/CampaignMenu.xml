@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<objects>
+	<script directory="gui/campaigns/grand_strategy/"/>
+
+	<object z="0" type="image" sprite="campaignBackground" size="0 0 100% 100%" name="campaignMenuWindow">
+
+		<!-- Computing Turn -->
+		<object name="computingTurn" hidden="true"
+			z="500" type="image" size="0 0 100% 100%" sprite="panelShader">
+			<object type="text" size="0 0 100% 100%" style="ModernLabelText">
+				<translatableAttribute id="caption">Computing Turn</translatableAttribute>
+			</object>
+		</object>
+
+		<!-- UI -->
+		<object z="100">
+			<!-- Top panel -->
+			<object name="topPanel" type="image" sprite="panelShader" size="0 0 100% 50">
+				<object name="topPanelText" type="text" style="ModernLabelText" size="0 0 100% 100%" />
+			</object>
+
+			<!-- Province detail panel -->
+			<object name="provinceDetails" size="100%-300 50 100% 100%-55" type="image" sprite="panelShader">
+				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
+					<translatableAttribute id="caption">Province Details</translatableAttribute>
+				</object>
+				<object name="provinceDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100%" />
+				<object name="doAttack" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
+					<translatableAttribute id="caption">Attack Province</translatableAttribute>
+				</object>
+			</object>
+
+			<object name="bottomPanel" size="30 100%-55 100%-5 100%-25" >
+
+				<!-- Exit & Back to Main Menu -->
+				<object name="backToMain" type="button" style="StoneButton" size="0 0 17% 100%">
+					<translatableAttribute id="caption">Back to Main Menu</translatableAttribute>
+				</object>
+
+				<object name="finishTurn" type="button" style="StoneButtonFancy" size="83%-25 0 100%-25 100%" enabled="false">
+					<translatableAttribute id="caption">Finish Turn</translatableAttribute>
+				</object>
+			</object>
+		</object>
+	
+		<!-- Provinces GFX -->
+		<object z="10">
+			<repeat count="20">
+				<object type="button" name="mapProvince[n]" sprite="" hidden="true" size="200 200 300 300">
+				</object>
+			</repeat>
+		</object>
+	</object>
+</objects>
