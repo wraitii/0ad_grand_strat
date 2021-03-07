@@ -51,14 +51,14 @@ class GameData
 	{
 		let game = new GameData();
 		g_GameData = game;
-		game.Deserialize(g_CampaignMenu.run.data.gameData);
-		if (g_CampaignMenu.run.data.processEndedGame)
+		game.Deserialize(CampaignRun.getCurrentRun().data.gameData);
+		if (CampaignRun.getCurrentRun().data.processEndedGame)
 		{
-			let data = g_CampaignMenu.run.data.processEndedGame;
+			let data = CampaignRun.getCurrentRun().data.processEndedGame;
 			if (game.processEndedGame(data))
 			{
-				delete g_CampaignMenu.run.data.processEndedGame;
-				this.save();
+				delete CampaignRun.getCurrentRun().data.processEndedGame;
+				game.save();
 			}
 		}
 
@@ -67,8 +67,8 @@ class GameData
 
 	save()
 	{
-		g_CampaignMenu.run.data.gameData = this.Serialize();
-		g_CampaignMenu.run.save();
+		CampaignRun.getCurrentRun().data.gameData = this.Serialize();
+		CampaignRun.getCurrentRun().save();
 	}
 
 	initialiseGame()
@@ -81,7 +81,7 @@ class GameData
 		// TODO: do this better
 		this.tribes.player = new Tribe("player");
 		this.playerTribe = "player";
-		this.provinces[255].ownerTribe = "player";
+		this.provinces["athens"].ownerTribe = "player";
 
 		this.save();
 	}
@@ -93,7 +93,7 @@ class GameData
 		{
 			let file = files[i];
 			let data = Engine.ReadJSONFile(file);
-			this.provinces[data.hash] = new Province(data.hash, file);
+			this.provinces[data.code] = new Province(data);
 		}
 	}
 
@@ -105,7 +105,7 @@ class GameData
 			"map": "maps/random/mainland",
 			"autostart": true,
 			"campaignData": {
-				"run": g_CampaignMenu.run.filename,
+				"run": CampaignRun.getCurrentRun().filename,
 				"province": code
 			}
 		});

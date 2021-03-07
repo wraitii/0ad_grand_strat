@@ -1,8 +1,8 @@
 class Province
 {
-	constructor(code, data)
+	constructor(data)
 	{
-		this.code = code;
+		this.code = data.code;
 		this.data = data;
 		this.gfxdata = Engine.ReadJSONFile(`art/textures/ui/campaigns/grand_strategy/provinces/${this.code}.json`);
 		this.icon = undefined;
