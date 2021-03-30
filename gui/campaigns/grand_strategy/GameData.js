@@ -126,18 +126,20 @@ class GameData
 	}
 
 	/**
-	 * Generate a map assuming the human player attacks the given code.
+	 * Generate a map and play out an attack.
 	 */
-	doAttack(code)
+	playOutAttack(attackerTribe, provinceCode)
 	{
-		let province = this.provinces[code];
-		if (province.ownerTribe == this.playerTribe)
+		let province = this.provinces[provinceCode];
+		if (province.ownerTribe == attackerTribe)
 		{
 			error("Cannot attack your own province");
 			return;
 		}
 
+		// TODO: should snapshot or something, also this assumes human player involved.
 		this.save();
+
 		// Generate a random map.
 		let settings = {
 			"mapType": "random",
@@ -147,13 +149,14 @@ class GameData
 			},
 			"campaignData": {
 				"run": CampaignRun.getCurrentRun().filename,
-				"province": code
+				"attacker": attackerTribe,
+				"province": provinceCode
 			}
 		};
 		let gameSettings = new GameSettings().init();
 		gameSettings.fromInitAttributes(settings);
 		// TODO: pass translated name, description, preview.
-		gameSettings.mapName.set(code);
+		gameSettings.mapName.set(`${this.tribes[attackerTribe].data.name} attack on ${provinceCode}`);
 
 		gameSettings.playerCount.setNb(2);
 		gameSettings.playerAI.set(1, {
@@ -161,8 +164,11 @@ class GameData
 			"difficulty": 2,
 			"behavior": "random",
 		});
-		gameSettings.playerCiv.setValue(0, this.tribes[this.playerTribe].civ);
-		gameSettings.playerCiv.setValue(1, this.tribes[province.ownerTribe].civ);
+		gameSettings.playerCiv.setValue(0, this.tribes[attackerTribe].civ);
+		if (province.ownerTribe)
+			gameSettings.playerCiv.setValue(1, this.tribes[province.ownerTribe].civ);
+		else
+			gameSettings.playerCiv.setValue(1, "random");
 
 		let assignments = {
 			"local": {
@@ -216,7 +222,7 @@ class GameData
 						this.turnEvents.push({
 							"type": "attack",
 							"data": {
-								"attacker": tribe,
+								"attacker": code,
 								"target": target
 							}
 						});
@@ -245,7 +251,7 @@ class GameData
 	{
 		if (endGameData.won)
 		{
-			this.provinces[endGameData.initData.province].ownerTribe = this.playerTribe;
+			this.provinces[endGameData.initData.province].ownerTribe = endGameData.initData.attacker;
 		}
 		return true;
 	}

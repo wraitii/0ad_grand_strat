@@ -112,7 +112,11 @@ class CampaignMenu
 		{
 			Engine.GetGUIObjectByName("eventPanel").hidden = false;
 			Engine.GetGUIObjectByName("eventPanelDesc").caption = event.type;
-			Engine.GetGUIObjectByName("eventPanelButton[0]").onPress = () => g_GameData.turnEvents.shift();
+			Engine.GetGUIObjectByName("eventPanelButton[0]").onPress = () => {
+				g_GameData.turnEvents.shift();
+				if (event.type === "attack")
+					g_GameData.playOutAttack(event.data.attacker, event.data.target);
+			};
 		}
 		else
 			Engine.GetGUIObjectByName("eventPanel").hidden = true;

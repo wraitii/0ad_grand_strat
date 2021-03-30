@@ -45,6 +45,6 @@ class Hero
 	doAttack(code)
 	{
 		this.actionsLeft--;
-		return g_GameData.doAttack(code);
+		return g_GameData.playOutAttack(this.tribe, code);
 	}
 }
