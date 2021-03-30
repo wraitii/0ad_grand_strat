@@ -12,31 +12,45 @@ class GameData
 		this.tribes = {};
 
 		this.playerTribe = undefined;
+		this.playerHero = undefined;
 
 		this.turnI = 0;
+		this.turnEvents = [];
 	}
 
 	Serialize()
 	{
+		let tribes = {};
+		for (let tribe in this.tribes)
+			tribes[tribe] = this.tribes[tribe].Serialize();
+
 		let pv = {};
 		for (let prov in this.provinces)
 			pv[prov] = this.provinces[prov].Serialize();
 		return {
 			"turn": this.turn,
 			"playerTribe": this.playerTribe,
-			"provinces": pv
-		}
+			"playerHero": this.playerHero.Serialize(),
+			"tribes": tribes,
+			"provinces": pv,
+		};
 	}
 
 	Deserialize(data)
 	{
 		this.parseHistory();
-		this.tribes.player = new Tribe("player");
 
 		this.turn = data.turn;
-		this.playerTribe = data.playerTribe;
+
 		for (let prov in data.provinces)
 			this.provinces[prov].Deserialize(data.provinces[prov]);
+
+		for (let code in data.tribes)
+			this.tribes[code].Deserialize(data.tribes[code]);
+
+		this.playerTribe = data.playerTribe;
+		this.playerHero = new Hero();
+		this.playerHero.Deserialize(data.playerHero);
 	}
 
 	static createNewGame()
@@ -74,14 +88,20 @@ class GameData
 	initialiseGame()
 	{
 		this.parseHistory();
-		// Parse tribes
-		// TODO
 
-		// Create player tribe.
-		// TODO: do this better
-		this.tribes.player = new Tribe("player");
-		this.playerTribe = "player";
-		this.provinces["athens"].ownerTribe = "player";
+		// Assign tribe initial provinces
+		for (let code in this.tribes)
+		{
+			let tribe = this.tribes[code];
+			if (!tribe.data.startProvinces)
+				continue;
+			for (let prov of tribe.data.startProvinces)
+				this.provinces[prov].setOwner(code);
+		}
+
+		// Create human player
+		this.playerTribe = "athens";
+		this.playerHero = new Hero("player", "athens");
 
 		this.save();
 	}
@@ -95,19 +115,65 @@ class GameData
 			let data = Engine.ReadJSONFile(file);
 			this.provinces[data.code] = new Province(data);
 		}
+
+		files = Engine.ListDirectoryFiles("campaigns/grand_strategy/tribes/", "**.json", false);
+		for (let i = 0; i < files.length; ++i)
+		{
+			let file = files[i];
+			let data = Engine.ReadJSONFile(file);
+			this.tribes[data.code] = new Tribe(data);
+		}
 	}
 
+	/**
+	 * Generate a map assuming the human player attacks the given code.
+	 */
 	doAttack(code)
 	{
+		let province = this.provinces[code];
+		if (province.ownerTribe == this.playerTribe)
+		{
+			error("Cannot attack your own province");
+			return;
+		}
+
+		this.save();
 		// Generate a random map.
-		Engine.SwitchGuiPage("page_gamesetup.xml", {
+		let settings = {
 			"mapType": "random",
 			"map": "maps/random/mainland",
-			"autostart": true,
+			"settings": {
+				"CheatsEnabled": true
+			},
 			"campaignData": {
 				"run": CampaignRun.getCurrentRun().filename,
 				"province": code
 			}
+		};
+		let gameSettings = new GameSettings().init();
+		gameSettings.fromInitAttributes(settings);
+		// TODO: pass translated name, description, preview.
+		gameSettings.mapName.set(code);
+
+		gameSettings.playerCount.setNb(2);
+		gameSettings.playerAI.set(1, {
+			"bot": "petra",
+			"difficulty": 2,
+			"behavior": "random",
+		});
+		gameSettings.playerCiv.setValue(0, this.tribes[this.playerTribe].civ);
+		gameSettings.playerCiv.setValue(1, this.tribes[province.ownerTribe].civ);
+
+		let assignments = {
+			"local": {
+				"player": 1,
+				"name": Engine.ConfigDB_GetValue("user", "playername.singleplayer") || Engine.GetSystemUsername()
+			}
+		};
+		gameSettings.launchGame(assignments);
+		Engine.SwitchGuiPage("page_loading.xml", {
+			"attribs": gameSettings.toInitAttributes(),
+			"playerAssignments": assignments
 		});
 	}
 
@@ -117,14 +183,62 @@ class GameData
 	doFinishTurn()
 	{
 		if (!this.turnI)
-			this.turnI = 100;
-		--this.turnI;
-		if (this.turnI !== 0)
-			return false;
-		this.turn++;
+		{
+			// Start of the turn
+			this.turnI = 25;
+			this.turnEvents = [];
+		}
 
-		this.save();
-		return true;
+		--this.turnI;
+
+		if (this.turnI === 1)
+		{
+			// Tribe '''AI'''
+			for (let code in this.tribes)
+			{
+				if (code === this.playerTribe)
+					continue;
+				let tribe = this.tribes[code];
+				let targets = new Set();
+				for (let prov of tribe.controlledProvinces)
+					for (let pot of g_GameData.provinces[prov].getLinks())
+					{
+						if (g_GameData.provinces[pot].ownerTribe !== code)
+							targets.add(pot);
+					}
+
+				if (randBool(0.5) && targets.size)
+				{
+					let target = pickRandom(Array.from(targets));
+					let province = g_GameData.provinces[target];
+					if (province.ownerTribe === this.playerTribe)
+					{
+						this.turnEvents.push({
+							"type": "attack",
+							"data": {
+								"attacker": tribe,
+								"target": target
+							}
+						});
+					}
+					else
+					{
+						province.setOwner(code);
+					}
+				}
+			}
+		}
+		else if (this.turnI === 0)
+		{
+			// End of turn, control will be returned to the player.
+			this.turn++;
+
+			this.playerHero.actionsLeft = 1;
+
+			this.save();
+			return true;
+		}
+		return false;
 	}
 
 	processEndedGame(endGameData)
@@ -133,8 +247,6 @@ class GameData
 		{
 			this.provinces[endGameData.initData.province].ownerTribe = this.playerTribe;
 		}
-
-		this.turn++;
 		return true;
 	}
 }

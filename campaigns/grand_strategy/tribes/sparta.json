@@ -1,0 +1,7 @@
+{
+	"code": "sparta",
+	"name": "Sparta",
+	"civ": "spart",
+	"color": "0 255 0",
+	"startProvinces": ["sparta"]
+}

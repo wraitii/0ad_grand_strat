@@ -1,0 +1,7 @@
+{
+	"code": "athens",
+	"name": "Athens",
+	"civ": "athen",
+	"color": "255 0 0",
+	"startProvinces": ["athens"]
+}

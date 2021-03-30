@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <objects>
+	<script file="gui/maps/MapCache.js"/>
+	<script directory="gui/gamesettings/"/>
+	<script directory="gui/gamesettings/attributes/"/>
 	<script directory="gui/campaigns/grand_strategy/"/>
 
 	<object z="0" type="image" sprite="campaignBackground" size="0 0 100% 100%" name="campaignMenuWindow">
@@ -20,14 +23,37 @@
 				<object name="topPanelText" type="text" style="ModernLabelText" size="0 0 100% 100%" />
 			</object>
 
+			<!-- Hero panel -->
+			<object name="heroDetails" size="100%-300 100 100% 300" type="image" sprite="panelShader">
+				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
+					<translatableAttribute id="caption">Hero Details</translatableAttribute>
+				</object>
+				<object name="heroDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100" />
+
+				<object name="doAttack" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
+					<translatableAttribute id="caption">Attack Province</translatableAttribute>
+				</object>
+			</object>
+
 			<!-- Province detail panel -->
-			<object name="provinceDetails" size="100%-300 50 100% 100%-55" type="image" sprite="panelShader">
+			<object name="provinceDetails" size="100%-300 350 100% 650" type="image" sprite="panelShader">
 				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
 					<translatableAttribute id="caption">Province Details</translatableAttribute>
 				</object>
 				<object name="provinceDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100%" />
-				<object name="doAttack" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
-					<translatableAttribute id="caption">Attack Province</translatableAttribute>
+				<object name="doMove" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
+					<translatableAttribute id="caption">Move to province</translatableAttribute>
+				</object>
+			</object>
+
+			<!-- Event panel -->
+			<object z="600" name="eventPanel" hidden="true" size="20% 20% 80% 80%" type="image" sprite="panelShader">
+				<object name="eventPanelTitle" style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
+					<translatableAttribute id="caption">Event!</translatableAttribute>
+				</object>
+				<object name="eventPanelDesc" type="text" style="ModernLabelText" size="0 40 100% 100%" />
+				<object name="eventPanelButton[0]" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12">
+					<translatableAttribute id="caption">Move to province</translatableAttribute>
 				</object>
 			</object>
 
@@ -44,12 +70,16 @@
 			</object>
 		</object>
 	
-		<!-- Provinces GFX -->
+		<!-- GFX -->
 		<object z="10">
+			<!-- Provinces -->
 			<repeat count="20">
 				<object type="button" name="mapProvince[n]" sprite="" hidden="true" size="200 200 300 300">
 				</object>
 			</repeat>
+
+			<!-- Hero -->
+			<object type="button" name="heroButton" sprite="stretched:session/portraits/units/gaul_hero_viridomarus.png" size="0 0 50 50"/>
 		</object>
 	</object>
 </objects>
