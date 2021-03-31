@@ -26,9 +26,15 @@ class Hero
 		this.actionsLeft = data.moves;
 	}
 
+	ownsProvince(code)
+	{
+		return g_GameData.provinces[code].ownerTribe === this.tribe;
+	}
+
+
 	canMove(code)
 	{
-		return this.actionsLeft > 0;
+		return this.actionsLeft >= 1;
 	}
 
 	doMove(code)
@@ -39,7 +45,7 @@ class Hero
 
 	canAttack(code)
 	{
-		return this.actionsLeft > 0;
+		return !this.ownsProvince(code) && this.actionsLeft >= 1;
 	}
 
 	doAttack(code)
@@ -47,4 +53,27 @@ class Hero
 		this.actionsLeft--;
 		return g_GameData.playOutAttack(this.tribe, code);
 	}
+
+	canStrengthen(code)
+	{
+		return this.ownsProvince(code) && this.actionsLeft >= 0.5 && g_GameData.provinces[code].garrison < 10;
+	}
+
+	doStrengthen(code)
+	{
+		this.actionsLeft -= 0.5;
+		return g_GameData.changeGarrison(code, 1);
+	}
+
+	canWeaken(code)
+	{
+		return this.ownsProvince(code) && this.actionsLeft >= 0.5 && g_GameData.provinces[code].garrison > 0;
+	}
+
+	doWeaken(code)
+	{
+		this.actionsLeft -= 0.5;
+		return g_GameData.changeGarrison(code, -1);
+	}
+
 }

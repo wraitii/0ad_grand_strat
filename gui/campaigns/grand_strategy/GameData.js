@@ -140,7 +140,8 @@ class GameData
 		// TODO: should snapshot or something, also this assumes human player involved.
 		this.save();
 
-		let playerID = attackerTribe == this.playerTribe ? 0 : 1;
+		let playerIsAttacker = attackerTribe == this.playerTribe;
+		let playerID = playerIsAttacker ? 0 : 1;
 
 		// Generate a random map.
 		let settings = {
@@ -153,7 +154,7 @@ class GameData
 				"run": CampaignRun.getCurrentRun().filename,
 				"province": provinceCode,
 				"attacker": attackerTribe,
-				"playerIsAttacker": attackerTribe == this.playerTribe,
+				"playerIsAttacker": playerIsAttacker,
 			}
 		};
 		let gameSettings = new GameSettings().init();
@@ -166,7 +167,7 @@ class GameData
 		let aiID = 1 - playerID;
 		gameSettings.playerAI.set(aiID, {
 			"bot": "petra",
-			"difficulty": 2,
+			"difficulty": playerIsAttacker ? province.garrison / 2 : 5 - province.garrison / 2,
 			"behavior": "random",
 		});
 		gameSettings.playerCiv.setValue(0, this.tribes[attackerTribe].civ);
@@ -188,11 +189,20 @@ class GameData
 		});
 	}
 
+	changeGarrison(provinceCode, delta)
+	{
+		this.provinces[provinceCode].garrison = Math.max(0, Math.min(10,
+			this.provinces[provinceCode].garrison + delta));
+	}
+
 	/**
 	 * TODO: would be nice to make this asynchronous
 	 */
 	doFinishTurn()
 	{
+		// The turnI variable is used to:
+		// - fake synchronicity (by doing less work each turn, it keeps the GUI responsive)
+		// - fake work - it looks weird if turns end too quickly :P.
 		if (!this.turnI)
 		{
 			// Start of the turn
@@ -202,7 +212,22 @@ class GameData
 
 		--this.turnI;
 
-		if (this.turnI === 1)
+		if (this.turnI === 2)
+		{
+			// Grant 100 Money for each owned province.
+			for (let tribeCode in this.tribes)
+			{
+				let tribe = this.tribes[tribeCode];
+				let totalBalance = 0;
+				for (let provinceCode of tribe.controlledProvinces)
+					totalBalance += this.provinces[provinceCode].getBalance();
+				// Clamp to avoid weirdness.
+				tribe.money = Math.max(-999999, Math.min(tribe.money + totalBalance, 999999999));
+				tribe.lastBalance = totalBalance;
+				// TODO: nasty events if in debt, possibly losing the game.
+			}
+		}
+		else if (this.turnI === 1)
 		{
 			// Tribe '''AI'''
 			for (let code in this.tribes)
@@ -224,6 +249,8 @@ class GameData
 					let province = g_GameData.provinces[target];
 					if (province.ownerTribe === this.playerTribe)
 					{
+						// too annoying when testing.
+						continue;
 						this.turnEvents.push({
 							"type": "attack",
 							"data": {
@@ -254,10 +281,9 @@ class GameData
 
 	processEndedGame(endGameData)
 	{
-		if (endGameData.won && endGameData.initData.playerIsAttacker)
-			this.provinces[endGameData.initData.province].ownerTribe = endGameData.initData.attacker;
-		else if (!endGameData.won && !endGameData.initData.playerIsAttacker)
-			this.provinces[endGameData.initData.province].ownerTribe = endGameData.initData.attacker;
+		if ((endGameData.won && endGameData.initData.playerIsAttacker) ||
+			(!endGameData.won && !endGameData.initData.playerIsAttacker))
+			this.provinces[endGameData.initData.province].setOwner(endGameData.initData.attacker);
 		// Otherwise no change necessary, the defenders won.
 		return true;
 	}

@@ -30,6 +30,12 @@
 				</object>
 				<object name="heroDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100" />
 
+				<object name="strengthenGarrison" type="button" style="StoneButtonFancy" size="20 100%-96 100%-20 100%-68" enabled="false">
+					<translatableAttribute id="caption">Strengthen Garrison</translatableAttribute>
+				</object>
+				<object name="weakenGarrison" type="button" style="StoneButtonFancy" size="20 100%-68 100%-20 100%-40" enabled="false">
+					<translatableAttribute id="caption">Weaken Garrison</translatableAttribute>
+				</object>
 				<object name="doAttack" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
 					<translatableAttribute id="caption">Attack Province</translatableAttribute>
 				</object>
@@ -40,10 +46,22 @@
 				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
 					<translatableAttribute id="caption">Province Details</translatableAttribute>
 				</object>
+				<object type="button" name="provinceOwnerButton" sprite="stretched:session/portraits/emblems/emblem_persians.png" size="100%-70 10 100%-10 70"/>
+
 				<object name="provinceDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100%" />
 				<object name="doMove" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
 					<translatableAttribute id="caption">Move to province</translatableAttribute>
 				</object>
+			</object>
+
+			<!-- Tribe detail panel -->
+			<object name="tribeDetails" size="100%-300 350 100% 650" hidden="true" type="image" sprite="panelShader">
+				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
+					<translatableAttribute id="caption">Tribe Details</translatableAttribute>
+				</object>
+				<object type="button" name="goToProvinceButton" sprite="stretched:session/portraits/emblems/emblem_athenians.png" size="100%-70 10 100%-10 70"/>
+
+				<object name="tribeDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100%" />
 			</object>
 
 			<!-- Event panel -->

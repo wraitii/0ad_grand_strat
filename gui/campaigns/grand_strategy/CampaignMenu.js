@@ -48,36 +48,74 @@ class CampaignMenu
 
 	displayProvinceDetails()
 	{
-		if (this.selectedProvince === -1)
+		if (this.selectedProvince === -1 || !Engine.GetGUIObjectByName("tribeDetails").hidden)
 		{
 			Engine.GetGUIObjectByName("provinceDetails").hidden = true;
 			return;
 		}
 		Engine.GetGUIObjectByName("provinceDetails").hidden = false;
 		let province = g_GameData.provinces[this.selectedProvince];
-		Engine.GetGUIObjectByName("provinceDetailsText").caption = JSON.stringify(province.Serialize());
+		Engine.GetGUIObjectByName("provinceDetailsText").caption = `` +
+		`Name: ${province.code}\n` +
+		`Owner: ${province.ownerTribe || "No-one"}\n` +
+		`Garrison strength: ${province.garrison}\n` +
+		`Balance: ${province.getBalance()}\n` +
+		``;
 
 		Engine.GetGUIObjectByName("doMove").enabled = g_GameData.playerHero.canMove(province.code) &&
 			province.code !== g_GameData.playerHero.location;
 		Engine.GetGUIObjectByName("doMove").onPress = () => g_GameData.playerHero.doMove(province.code);
+
+		Engine.GetGUIObjectByName("provinceOwnerButton").onPress = () => this.displayTribeDetails(province.ownerTribe);
+	}
+
+
+	displayTribeDetails(tribeCode)
+	{
+		if (tribeCode === -1)
+		{
+			Engine.GetGUIObjectByName("tribeDetails").hidden = true;
+			return;
+		}
+		Engine.GetGUIObjectByName("tribeDetails").hidden = false;
+
+		let tribe = g_GameData.tribes[tribeCode];
+		Engine.GetGUIObjectByName("tribeDetailsText").caption = `` +
+		`Name: ${tribe.data.name}\n` +
+		`Money: ${tribe.money}\n` +
+		``;
+
+		Engine.GetGUIObjectByName("goToProvinceButton").onPress = () => {
+			this.displayTribeDetails(-1);
+			this.displayProvinceDetails();
+		};
 	}
 
 	displayHeroDetails()
 	{
 		Engine.GetGUIObjectByName("heroDetailsText").caption = `` +
 		`Moves left: ${g_GameData.playerHero.actionsLeft}\n` +
-		`Location: ${g_GameData.playerHero.location}`;
+		`Location: ${g_GameData.playerHero.location}\n` +
+		`Owner: ${g_GameData.provinces[g_GameData.playerHero.location].ownerTribe || "No-one" }\n`;
 		let province = g_GameData.provinces[g_GameData.playerHero.location];
 
-		Engine.GetGUIObjectByName("doAttack").enabled = g_GameData.playerHero.canAttack(province.code) &&
-			province.ownerTribe !== g_GameData.playerTribe;
+		Engine.GetGUIObjectByName("doAttack").enabled = g_GameData.playerHero.canAttack(province.code);
 		Engine.GetGUIObjectByName("doAttack").onPress = () => g_GameData.playerHero.doAttack(province.code);
+
+		Engine.GetGUIObjectByName("strengthenGarrison").enabled = g_GameData.playerHero.canStrengthen(province.code);
+		Engine.GetGUIObjectByName("weakenGarrison").enabled = g_GameData.playerHero.canWeaken(province.code);
+		Engine.GetGUIObjectByName("strengthenGarrison").onPress = () => g_GameData.playerHero.doStrengthen(province.code);
+		Engine.GetGUIObjectByName("weakenGarrison").onPress = () => g_GameData.playerHero.doWeaken(province.code);
 	}
 
 	render()
 	{
 		Engine.GetGUIObjectByName("topPanelText").caption = `` +
-		`Turn ${g_GameData.turn} Tribe "${g_GameData.playerTribe}" Money ${g_GameData.tribes[g_GameData.playerTribe].money}`;
+		`Turn ${g_GameData.turn}` +
+		` Tribe "${g_GameData.playerTribe}"` +
+		` Money ${g_GameData.tribes[g_GameData.playerTribe].money}` +
+		` Balance ${g_GameData.tribes[g_GameData.playerTribe].lastBalance}` +
+		``;
 
 		this.displayHeroDetails();
 		this.displayProvinceDetails();
@@ -97,7 +135,7 @@ class CampaignMenu
 				let icon = Engine.GetGUIObjectByName(`mapProvince[${i++}]`);
 				icon.size = this.toSize(...province.gfxdata.size);
 				icon.hidden = false;
-				icon.onPress = () => { this.selectedProvince = province.code; };
+				icon.onPress = () => { this.displayTribeDetails(-1); this.selectedProvince = province.code; };
 				province.icon = icon;
 			}
 			if (province.code !== this.selectedProvince)

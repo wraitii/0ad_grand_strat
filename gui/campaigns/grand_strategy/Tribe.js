@@ -9,15 +9,19 @@ class Tribe
 		this.data = data;
 
 		this.color = data.color || "255 0 0";
-		this.money = 0;
+
 		this.controlledProvinces = [];
 		this.civ = "iber";
+
+		this.money = 0;
+		this.lastBalance = 0;
 	}
 
 	Serialize()
 	{
 		return {
 			"money": this.money,
+			"lastBalance": this.lastBalance || 0,
 			"civ": this.civ,
 		};
 	}
@@ -25,6 +29,7 @@ class Tribe
 	Deserialize(data)
 	{
 		this.money = data.money;
+		this.lastBalance = data.lastBalance;
 		this.civ = data.civ;
 
 		for (let prov in g_GameData.provinces)

@@ -7,13 +7,17 @@ class Province
 		this.gfxdata = Engine.ReadJSONFile(`art/textures/ui/campaigns/grand_strategy/provinces/${this.code}.json`);
 		this.icon = undefined;
 		this.ownerTribe = undefined;
+
+		// Indicative of the defensive strength should an attack occur. Also costs money.
+		this.garrison = 0;
 	}
 
 	Serialize()
 	{
 		return {
 			"code": this.code,
-			"ownerTribe": this.ownerTribe
+			"ownerTribe": this.ownerTribe,
+			"garrison": this.garrison > 0 ? this.garrison : undefined
 		};
 	}
 
@@ -21,6 +25,7 @@ class Province
 	{
 		this.code = data.code;
 		this.ownerTribe = data.ownerTribe;
+		this.garrison = data.garrison || 0;
 	}
 
 	// UI
@@ -54,5 +59,10 @@ class Province
 	getLinks()
 	{
 		return this.data.links || [];
+	}
+
+	getBalance()
+	{
+		return 100 - this.garrison * 50;
 	}
 }
