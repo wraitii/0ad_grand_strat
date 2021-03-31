@@ -140,6 +140,8 @@ class GameData
 		// TODO: should snapshot or something, also this assumes human player involved.
 		this.save();
 
+		let playerID = attackerTribe == this.playerTribe ? 0 : 1;
+
 		// Generate a random map.
 		let settings = {
 			"mapType": "random",
@@ -149,8 +151,9 @@ class GameData
 			},
 			"campaignData": {
 				"run": CampaignRun.getCurrentRun().filename,
+				"province": provinceCode,
 				"attacker": attackerTribe,
-				"province": provinceCode
+				"playerIsAttacker": attackerTribe == this.playerTribe,
 			}
 		};
 		let gameSettings = new GameSettings().init();
@@ -159,7 +162,9 @@ class GameData
 		gameSettings.mapName.set(`${this.tribes[attackerTribe].data.name} attack on ${provinceCode}`);
 
 		gameSettings.playerCount.setNb(2);
-		gameSettings.playerAI.set(1, {
+		// TODO: make all this more generic.
+		let aiID = 1 - playerID;
+		gameSettings.playerAI.set(aiID, {
 			"bot": "petra",
 			"difficulty": 2,
 			"behavior": "random",
@@ -172,7 +177,7 @@ class GameData
 
 		let assignments = {
 			"local": {
-				"player": 1,
+				"player": playerID + 1,
 				"name": Engine.ConfigDB_GetValue("user", "playername.singleplayer") || Engine.GetSystemUsername()
 			}
 		};
@@ -249,10 +254,11 @@ class GameData
 
 	processEndedGame(endGameData)
 	{
-		if (endGameData.won)
-		{
+		if (endGameData.won && endGameData.initData.playerIsAttacker)
 			this.provinces[endGameData.initData.province].ownerTribe = endGameData.initData.attacker;
-		}
+		else if (!endGameData.won && !endGameData.initData.playerIsAttacker)
+			this.provinces[endGameData.initData.province].ownerTribe = endGameData.initData.attacker;
+		// Otherwise no change necessary, the defenders won.
 		return true;
 	}
 }
