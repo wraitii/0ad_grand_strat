@@ -74,7 +74,7 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("provinceDetails").hidden = false;
 		let province = g_GameData.provinces[this.selectedProvince];
 		Engine.GetGUIObjectByName("provinceDetailsText").caption = `` +
-		`Name: ${province.code}\n` +
+		`Name: ${province.name}\n` +
 		`Owner: ${province.ownerTribe || "No-one"}\n` +
 		`Garrison strength: ${province.garrison}\n` +
 		`Balance: ${province.getBalance()}\n` +
@@ -84,7 +84,17 @@ class CampaignMenu
 			province.code !== g_GameData.playerHero.location;
 		Engine.GetGUIObjectByName("doMove").onPress = () => g_GameData.playerHero.doMove(province.code);
 
-		Engine.GetGUIObjectByName("provinceOwnerButton").onPress = () => this.displayTribeDetails(province.ownerTribe);
+		if (province.ownerTribe)
+		{
+			Engine.GetGUIObjectByName("provinceOwnerButton").onPress = () => this.displayTribeDetails(province.ownerTribe);
+			Engine.GetGUIObjectByName("provinceOwnerButton").sprite = "stretched:session/portraits/emblems/emblem_persians.png";
+			Engine.GetGUIObjectByName("provinceOwnerButton").enabled = true;
+		}
+		else
+		{
+			Engine.GetGUIObjectByName("provinceOwnerButton").enabled = false;
+			Engine.GetGUIObjectByName("provinceOwnerButton").sprite = "grayscale:stretched:session/portraits/emblems/emblem_persians.png";
+		}
 	}
 
 
@@ -113,7 +123,7 @@ class CampaignMenu
 	{
 		Engine.GetGUIObjectByName("heroDetailsText").caption = `` +
 		`Moves left: ${g_GameData.playerHero.actionsLeft}\n` +
-		`Location: ${g_GameData.playerHero.location}\n` +
+		`Location: ${g_GameData.provinces[g_GameData.playerHero.location].name}\n` +
 		`Owner: ${g_GameData.provinces[g_GameData.playerHero.location].ownerTribe || "No-one" }\n`;
 		let province = g_GameData.provinces[g_GameData.playerHero.location];
 
@@ -158,10 +168,12 @@ class CampaignMenu
 				province.icon.mouse_event_mask = "texture:campaigns/grand_strategy/provinces/" + province.code + ".png";
 			}
 			province.icon.size = this.toGUISize(...province.gfxdata.size);
-			if (province.code !== this.selectedProvince)
-				province.icon.sprite = `color:${province.getColor()} 20:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
+			if (province.code === this.selectedProvince)
+				province.icon.sprite = `color:${province.getColor()} 100:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
+			else if (province.ownerTribe)
+				province.icon.sprite = `color:${province.getColor()} 70:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
 			else
-				province.icon.sprite = `color:${province.getColor()} 50:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
+				province.icon.sprite = `color:${province.getColor()} 30:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
 		}
 
 		// Render event

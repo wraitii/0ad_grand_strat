@@ -1,4 +1,5 @@
 import copy
+import glob
 import json
 import pygame
 
@@ -124,3 +125,15 @@ class Province:
         if ep[0] < 0 or ep[0] >= PROV_SIZE or ep[1] < 0 or ep[1] >= PROV_SIZE:
             return False
         return self.surface.get_at(ep) == self.color
+
+def load_provinces():
+    global provinces
+    provinces.clear()
+    provFiles = glob.glob(PATH_TO_HISTORY + "*.json")
+    for prov in provFiles:
+        try:
+            province = Province(prov.replace(PATH_TO_HISTORY, "").replace(".json", "")).load()
+        except Exception as err:
+            print(err)
+            continue
+        provinces[province.code] = province

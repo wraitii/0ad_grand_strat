@@ -1,7 +1,7 @@
 import pygame
 
 from .scroll import scroll
-from .province import provinces
+from ..common.province import provinces
 from .input_state import InputState
 
 class CenterPointMode(InputState):

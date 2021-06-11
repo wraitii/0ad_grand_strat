@@ -5,7 +5,7 @@ import random
 
 import pygame
 
-from .province import Province, provinces
+from ..common.province import Province, provinces, load_provinces
 from ..config import PATH_TO_ART, PATH_TO_HISTORY, BASES
 
 from .mode_link import LinkMode
@@ -46,15 +46,10 @@ print(f"Ready - loaded {len(baseImages)} images")
 
 usedColors = set()
 
-provFiles = glob.glob(PATH_TO_HISTORY + "*.json")
-for prov in provFiles:
-    try:
-        province = Province(prov.replace(PATH_TO_HISTORY, "").replace(".json", "")).load()
-    except Exception as err:
-        print(err)
-        continue
-    provinces[province.code] = province
-    usedColors.add(province.color)
+load_provinces()
+for prov in provinces:
+    usedColors.add(provinces[prov].color)
+
 
 def findColor():
     while True:

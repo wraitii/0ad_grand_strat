@@ -16,6 +16,8 @@ class GameData
 
 		this.turnI = 0;
 		this.turnEvents = [];
+
+		this.mapTypes = new MapTypes();
 	}
 
 	Serialize()
@@ -160,7 +162,28 @@ class GameData
 		let gameSettings = new GameSettings().init();
 		gameSettings.fromInitAttributes(settings);
 		// TODO: pass translated name, description, preview.
-		gameSettings.mapName.set(`${this.tribes[attackerTribe].data.name} attack on ${provinceCode}`);
+		gameSettings.mapName.set(`${this.tribes[attackerTribe].data.name} attack on ${province.name}`);
+
+		// TODO: add function to do this.
+		if (province.data?.mapTypes !== undefined)
+		{
+			const combinations = [];
+			for (let type of province.data?.mapTypes)
+				combinations.push(this.mapTypes.parse(type));
+			warn(uneval(combinations));
+			const combination = pickRandom(combinations);
+			if (combination.maps)
+			{
+				// TODO: biomes should support random
+				//gameSettings.map.setRandomOptions(combination.maps.map(x => "maps/" + x));
+				gameSettings.map.selectMap(pickRandom(combination.maps.map(x => "maps/" + x)));
+			}
+			if (combination.biomes)
+			{
+				gameSettings.biome.available = new Set(combination.biomes);
+				gameSettings.biome.setBiome("random");
+			}
+		}
 
 		gameSettings.playerCount.setNb(2);
 		// TODO: make all this more generic.

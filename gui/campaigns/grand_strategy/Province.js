@@ -7,6 +7,7 @@ class Province
 		this.gfxdata = Engine.ReadJSONFile(`art/textures/ui/campaigns/grand_strategy/provinces/${this.code}.json`);
 		this.icon = undefined;
 		this.ownerTribe = undefined;
+		this.name = this.data.name;
 
 		// Indicative of the defensive strength should an attack occur. Also costs money.
 		this.garrison = 0;
@@ -34,7 +35,10 @@ class Province
 	{
 		if (this.ownerTribe)
 			return g_GameData.tribes[this.ownerTribe].color;
-		return "255 255 255";
+		const r = Math.floor(this.data.hash / 1000000);
+		const g = Math.floor((this.data.hash - r * 1000000) / 1000);
+		const b = Math.floor((this.data.hash - r * 1000000 - g * 1000));
+		return `${r} ${g} ${b}`;
 	}
 
 	getHeroPos()
