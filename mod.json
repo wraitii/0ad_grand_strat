@@ -4,5 +4,6 @@
 	"label": "Grand Strategy",
 	"url": "github.com/wraitii/grand_strategy",
 	"description": "Some UX improvements tests",
-	"dependencies": ["0ad=0.0.25"]
+	"dependencies": ["0ad=0.0.25"],
+	"ignoreInCompatibilityChecks": true
 }

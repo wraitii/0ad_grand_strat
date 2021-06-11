@@ -1,5 +1,1 @@
-{
-	"hash": 140087035,
-	"code": "thrace",
-	"links": ["macedonia", "thessalonica"]
-}
+{"code": "thrace", "hash": 69177020, "links": ["bythnia", "dacia", "macedonia", "ionia"], "centerpoint": [1165, 931]}

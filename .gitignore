@@ -1,2 +1,2 @@
-campaigns/grand_strategy/bases/
-raw/
+*.pyc
+__pycache__

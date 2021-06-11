@@ -11,6 +11,15 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("campaignMenuWindow").onTick = () => this.onTick();
 		Engine.GetGUIObjectByName("finishTurn").onPress = () => this.doFinishTurn();
 		Engine.GetGUIObjectByName('backToMain').onPress = () => this.goBackToMainMenu();
+
+		/*Engine.SetGlobalHotkey("grand_strategy.camera.left", "Down", () => { this.cameraX -= 5; });
+		Engine.SetGlobalHotkey("grand_strategy.camera.right", "Down", () => { this.cameraX += 5; });
+		Engine.SetGlobalHotkey("grand_strategy.camera.up", "Down", () => { this.cameraZ -= 5; });
+		Engine.SetGlobalHotkey("grand_strategy.camera.down", "Down", () => { this.cameraZ += 5; });
+		*/
+
+		this.cameraX = 0;
+		this.cameraZ = 0;
 	}
 
 	initialise()
@@ -20,6 +29,10 @@ class CampaignMenu
 
 		if (!g_GameData)
 			GameData.createNewGame();
+
+		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
+		this.cameraX = pos[0] - 400;
+		this.cameraZ = pos[1] - 400;
 
 		this.render();
 	}
@@ -40,7 +53,12 @@ class CampaignMenu
 		if (!Engine.GetGUIObjectByName("computingTurn").hidden)
 		{
 			if (g_GameData.doFinishTurn())
+			{
 				Engine.GetGUIObjectByName("computingTurn").hidden = true;
+				const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
+				this.cameraX = pos[0] - 400;
+				this.cameraZ = pos[1] - 400;
+			}
 			return;
 		}
 		this.render();
@@ -121,9 +139,10 @@ class CampaignMenu
 		this.displayProvinceDetails();
 
 		// Update heros
-		let hero = g_GameData.playerHero;
-		let heroIcon = Engine.GetGUIObjectByName("heroButton");
-		heroIcon.size = this.toSize(...this.centeredSizeAt([100, 100], g_GameData.provinces[hero.location].getHeroPos()));
+		const hero = g_GameData.playerHero;
+		const heroIcon = Engine.GetGUIObjectByName("heroButton");
+		const pos = g_GameData.provinces[hero.location].getHeroPos();
+		heroIcon.size = this.toGUISize(...this.centeredSizeAt([16, 16], pos));
 
 		// Update provinces
 		let i = 0;
@@ -133,15 +152,16 @@ class CampaignMenu
 			if (!province.icon)
 			{
 				let icon = Engine.GetGUIObjectByName(`mapProvince[${i++}]`);
-				icon.size = this.toSize(...province.gfxdata.size);
 				icon.hidden = false;
 				icon.onPress = () => { this.displayTribeDetails(-1); this.selectedProvince = province.code; };
 				province.icon = icon;
+				province.icon.mouse_event_mask = "texture:campaigns/grand_strategy/provinces/" + province.code + ".png";
 			}
+			province.icon.size = this.toGUISize(...province.gfxdata.size);
 			if (province.code !== this.selectedProvince)
-				province.icon.sprite = `color:${province.getColor()} 20:stretched:campaigns/grand_strategy/provinces/${province.code}.png`;
+				province.icon.sprite = `color:${province.getColor()} 20:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
 			else
-				province.icon.sprite = `color:${province.getColor()} 50:stretched:campaigns/grand_strategy/provinces/${province.code}.png`;
+				province.icon.sprite = `color:${province.getColor()} 50:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
 		}
 
 		// Render event
@@ -164,12 +184,17 @@ class CampaignMenu
 
 	centeredSizeAt(size, pos)
 	{
-		return [pos[0]-size[0]/2, pos[1]-size[1]/2, pos[0]+size[0]/2, pos[1]+size[1]/2];
+		return [
+			pos[0] - size[0],
+			pos[1] - size[1],
+			pos[0] + size[0],
+			pos[1] + size[1]
+		];
 	}
 
-	toSize(x0, z0, x1, z1)
+	toGUISize(x0, z0, x1, z1)
 	{
-		return `${x0/2} ${z0/2} ${x1/2} ${z1/2}`;
+		return `${x0 - this.cameraX} ${z0 - this.cameraZ} ${x1 - this.cameraX} ${z1 - this.cameraZ}`;
 	}
 }
 
@@ -185,6 +210,7 @@ function init(initData)
 		g_CampaignMenu.initialise();
 	} catch (err) {
 		error(sprintf(translate("Error loading campaign run %s: %s."), CampaignRun.getCurrentRunFilename(), err));
+		error(err.stack.toString());
 		Engine.SwitchGuiPage("page_pregame.xml", {});
 	}
 }

@@ -34,6 +34,8 @@ class Hero
 
 	canMove(code)
 	{
+		if (!g_GameData.provinces[code].canTravel(this.location))
+			return false;
 		return this.actionsLeft >= 1;
 	}
 

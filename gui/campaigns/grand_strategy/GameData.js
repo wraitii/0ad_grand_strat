@@ -101,7 +101,7 @@ class GameData
 
 		// Create human player
 		this.playerTribe = "athens";
-		this.playerHero = new Hero("player", "athens");
+		this.playerHero = new Hero("athens", "thessalia");
 
 		this.save();
 	}
@@ -271,7 +271,7 @@ class GameData
 			// End of turn, control will be returned to the player.
 			this.turn++;
 
-			this.playerHero.actionsLeft = 1;
+			this.playerHero.actionsLeft = Math.min(2, this.playerHero.actionsLeft + 1);
 
 			this.save();
 			return true;

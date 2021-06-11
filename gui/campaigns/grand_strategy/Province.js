@@ -39,6 +39,8 @@ class Province
 
 	getHeroPos()
 	{
+		if (this.data.centerpoint)
+			return this.data.centerpoint;
 		return [(this.gfxdata.size[2] + this.gfxdata.size[0]) / 2,
 			(this.gfxdata.size[3] + this.gfxdata.size[1]) / 2];
 	}
@@ -64,5 +66,11 @@ class Province
 	getBalance()
 	{
 		return 100 - this.garrison * 50;
+	}
+
+	// TODO: A*
+	canTravel(code)
+	{
+		return this.data?.links?.indexOf(code) !== -1;
 	}
 }
