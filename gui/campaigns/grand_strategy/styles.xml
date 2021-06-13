@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<styles>
+	<style name="InfoTickerList"
+		buffer_zone="3"
+		font="sans-bold-stroke-14"
+		scrollbar="true"
+		scrollbar_style="ModernScrollBar"
+		sprite="ModernDarkBox"
+		sprite_selectarea="ModernDarkBox"
+		sprite_selectarea_overlay="ModernDarkBoxWhiteBorder"
+		textcolor="white"
+		textcolor_selected="white"
+		text_align="left"
+		sound_selected="audio/interface/ui/ui_button_click.ogg"
+		scroll_bottom="true"
+	/>
+</styles>

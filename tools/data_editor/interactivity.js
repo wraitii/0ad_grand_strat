@@ -26,6 +26,7 @@ document.querySelector("#update").onclick = () => {
 			"code": sel.children[0].textContent,
 			"name": sel.children[1].textContent,
 			"mapTypes": sel.children[2].textContent,
+			"civs": sel.children[3].textContent,
 		});
 	}
 	fetch("update", {

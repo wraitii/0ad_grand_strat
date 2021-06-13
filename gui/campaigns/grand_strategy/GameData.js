@@ -18,23 +18,27 @@ class GameData
 		this.turnEvents = [];
 
 		this.mapTypes = new MapTypes();
+
+		this.pastTurnEvents = [];
 	}
 
 	Serialize()
 	{
-		let tribes = {};
-		for (let tribe in this.tribes)
+		const tribes = {};
+		for (const tribe in this.tribes)
 			tribes[tribe] = this.tribes[tribe].Serialize();
 
-		let pv = {};
-		for (let prov in this.provinces)
+		const pv = {};
+		for (const prov in this.provinces)
 			pv[prov] = this.provinces[prov].Serialize();
+
 		return {
 			"turn": this.turn,
 			"playerTribe": this.playerTribe,
 			"playerHero": this.playerHero.Serialize(),
 			"tribes": tribes,
 			"provinces": pv,
+			"events": this.pastTurnEvents
 		};
 	}
 
@@ -53,6 +57,8 @@ class GameData
 		this.playerTribe = data.playerTribe;
 		this.playerHero = new Hero();
 		this.playerHero.Deserialize(data.playerHero);
+
+		this.pastTurnEvents = data.events || [];
 	}
 
 	static createNewGame()
@@ -170,15 +176,14 @@ class GameData
 			const combinations = [];
 			for (let type of province.data?.mapTypes)
 				combinations.push(this.mapTypes.parse(type));
-			warn(uneval(combinations));
 			const combination = pickRandom(combinations);
-			if (combination.maps)
+			if (combination?.maps)
 			{
 				// TODO: biomes should support random
 				//gameSettings.map.setRandomOptions(combination.maps.map(x => "maps/" + x));
 				gameSettings.map.selectMap(pickRandom(combination.maps.map(x => "maps/" + x)));
 			}
-			if (combination.biomes)
+			if (combination?.biomes)
 			{
 				gameSettings.biome.available = new Set(combination.biomes);
 				gameSettings.biome.setBiome("random");
@@ -197,7 +202,10 @@ class GameData
 		if (province.ownerTribe)
 			gameSettings.playerCiv.setValue(1, this.tribes[province.ownerTribe].civ);
 		else
-			gameSettings.playerCiv.setValue(1, "random");
+		{
+			// TODO: support random options.
+			gameSettings.playerCiv.setValue(1, pickRandom(province.getNativeCivs()));
+		}
 
 		let assignments = {
 			"local": {
@@ -284,7 +292,18 @@ class GameData
 					}
 					else
 					{
+						// TODO: simulate fighting.
 						province.setOwner(code);
+						this.turnEvents.push({
+							"type": "conquest",
+							"data": {
+								"attacker": code,
+								"target": target
+							},
+							"ticker": {
+								"text": "%(attacker)s has conquered %(target)s"
+							}
+						});
 					}
 				}
 			}
@@ -295,6 +314,8 @@ class GameData
 			this.turn++;
 
 			this.playerHero.actionsLeft = Math.min(2, this.playerHero.actionsLeft + 1);
+
+			this.pastTurnEvents.push(clone(this.turnEvents));
 
 			this.save();
 			return true;

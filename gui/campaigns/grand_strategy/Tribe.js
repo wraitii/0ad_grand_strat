@@ -11,7 +11,7 @@ class Tribe
 		this.color = data.color || "255 0 0";
 
 		this.controlledProvinces = [];
-		this.civ = "iber";
+		this.civ = data.civ;
 
 		this.money = 0;
 		this.lastBalance = 0;

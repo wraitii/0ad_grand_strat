@@ -22,13 +22,14 @@ def show_provinces():
     ret = HEAD + open("tools/data_editor/header.html", "r").read()
     ret += "<body>"
     ret += "<table>"
-    ret += "<tr><th>Code</th><th>Name</th><th>Map Types</th></tr>"
+    ret += "<tr><th class='id'>Code</th><th class='name'>Name</th><th class='mapTypes'>Map Types</th><th class='civs'>Civs</th></tr>"
     tt = sorted(provinces.keys())
     for prov in tt:
         pv = provinces[prov]
         ret += f"<tr class='province' id='{prov}'><td class='id' contenteditable='true'>{prov}</td>"
         ret += f"<td class='name' contenteditable='true'>{pv.history['name'] if 'name' in pv.history else prov.capitalize()}</td>"
         ret += f"<td class='mapTypes' contenteditable='true'>{', '.join(ornil(pv.history, 'mapTypes', []))}</td>"
+        ret += f"<td class='civs' contenteditable='true'>{', '.join(ornil(pv.history, 'civs', []))}</td>"
         ret += "</tr>"
     ret += "</table>"
     ret += "<p class='button'><a id='update'>Update</a></p>"
@@ -67,6 +68,11 @@ def update():
             data["mapTypes"] = [x.strip() for x in item["mapTypes"].split(",") if len(x.strip()) > 0]
         except Exception as err:
             print("Error parsing mapTypes " + str(err))
+            pass
+        try:
+            data["civs"] = [x.strip() for x in item["civs"].split(",") if len(x.strip()) > 0]
+        except Exception as err:
+            print("Error parsing civs " + str(err))
             pass
         open(PATH_TO_HISTORY + item["code"] + ".json", "w").write(json.dumps(data))
 

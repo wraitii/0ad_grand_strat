@@ -12,6 +12,11 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("finishTurn").onPress = () => this.doFinishTurn();
 		Engine.GetGUIObjectByName('backToMain').onPress = () => this.goBackToMainMenu();
 
+		this.infoTicker = new InfoTicker();
+
+		Engine.GetGUIObjectByName("campaignMenuWindow").onMouseLeftPress = () => this.onBlur();
+		Engine.GetGUIObjectByName("campaignMenuWindow").onMouseRightPress = () => this.onBlur();
+
 		/*Engine.SetGlobalHotkey("grand_strategy.camera.left", "Down", () => { this.cameraX -= 5; });
 		Engine.SetGlobalHotkey("grand_strategy.camera.right", "Down", () => { this.cameraX += 5; });
 		Engine.SetGlobalHotkey("grand_strategy.camera.up", "Down", () => { this.cameraZ -= 5; });
@@ -34,6 +39,8 @@ class CampaignMenu
 		this.cameraX = pos[0] - 400;
 		this.cameraZ = pos[1] - 400;
 
+		this.infoTicker.initialise();
+
 		this.render();
 	}
 
@@ -50,18 +57,32 @@ class CampaignMenu
 
 	onTick()
 	{
+		// TODO: unhack this.
 		if (!Engine.GetGUIObjectByName("computingTurn").hidden)
 		{
 			if (g_GameData.doFinishTurn())
-			{
-				Engine.GetGUIObjectByName("computingTurn").hidden = true;
-				const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
-				this.cameraX = pos[0] - 400;
-				this.cameraZ = pos[1] - 400;
-			}
+				this.onTurnComputationEnd();
 			return;
 		}
 		this.render();
+	}
+
+	onTurnComputationEnd()
+	{
+		Engine.GetGUIObjectByName("computingTurn").hidden = true;
+		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
+		this.cameraX = pos[0] - 400;
+		this.cameraZ = pos[1] - 400;
+		this.infoTicker.onTurnEnd();
+	}
+
+	/**
+	 * Triggered when pressing the map background.
+	 */
+	onBlur()
+	{
+		Engine.GetGUIObjectByName("contextPanel").hidden = true;
+		this.selectedProvince = -1;
 	}
 
 	displayProvinceDetails()
@@ -136,6 +157,27 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("weakenGarrison").onPress = () => g_GameData.playerHero.doWeaken(province.code);
 	}
 
+	displayContextualPanel(code)
+	{
+		if (code === -1)
+		{
+			Engine.GetGUIObjectByName("contextPanel").hidden = true;
+			return;
+		}
+		this.selectedProvince = code;
+		const pos = g_GameData.provinces[code].getHeroPos();
+		Engine.GetGUIObjectByName("contextPanel").size = this.toGUISize(...pos, pos[0] + 250, pos[1] + 200);
+		Engine.GetGUIObjectByName("contextPanel").hidden = false;
+
+		Engine.GetGUIObjectByName("contextPanelButton[0]").enabled = g_GameData.playerHero.canMove(code) &&
+			code !== g_GameData.playerHero.location;
+		Engine.GetGUIObjectByName("contextPanelButton[0]").onPress = () => {
+			g_GameData.playerHero.doMove(code);
+			this.displayContextualPanel(-1);
+		}
+		Engine.GetGUIObjectByName("contextPanelButton[0]").caption="Move there"
+	}
+
 	render()
 	{
 		Engine.GetGUIObjectByName("topPanelText").caption = `` +
@@ -164,6 +206,7 @@ class CampaignMenu
 				let icon = Engine.GetGUIObjectByName(`mapProvince[${i++}]`);
 				icon.hidden = false;
 				icon.onPress = () => { this.displayTribeDetails(-1); this.selectedProvince = province.code; };
+				icon.onMouseRightPress = () => { this.displayContextualPanel(province.code); };
 				province.icon = icon;
 				province.icon.mouse_event_mask = "texture:campaigns/grand_strategy/provinces/" + province.code + ".png";
 			}

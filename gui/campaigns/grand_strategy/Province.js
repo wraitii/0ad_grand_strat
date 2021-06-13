@@ -16,7 +16,6 @@ class Province
 	Serialize()
 	{
 		return {
-			"code": this.code,
 			"ownerTribe": this.ownerTribe,
 			"garrison": this.garrison > 0 ? this.garrison : undefined
 		};
@@ -24,7 +23,6 @@ class Province
 
 	Deserialize(data)
 	{
-		this.code = data.code;
 		this.ownerTribe = data.ownerTribe;
 		this.garrison = data.garrison || 0;
 	}
@@ -49,6 +47,16 @@ class Province
 			(this.gfxdata.size[3] + this.gfxdata.size[1]) / 2];
 	}
 
+	getLinks()
+	{
+		return this.data.links || [];
+	}
+
+	getNativeCivs()
+	{
+		return this.data.civs ?? ["random"];
+	}
+
 	// Game
 
 	setOwner(tribe)
@@ -60,11 +68,6 @@ class Province
 			this.ownerTribe = tribe;
 			g_GameData.tribes[this.ownerTribe].GainControl(this.code);
 		}
-	}
-
-	getLinks()
-	{
-		return this.data.links || [];
 	}
 
 	getBalance()

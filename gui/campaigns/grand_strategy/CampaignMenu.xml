@@ -62,6 +62,18 @@
 				<object type="button" name="goToProvinceButton" sprite="stretched:session/portraits/emblems/emblem_athenians.png" size="100%-70 10 100%-10 70"/>
 			</object>
 
+			<!-- Info ticker -->
+			<object name="infoTicker" size="50%-300 100%-140 50%+300 100%" type="image" sprite="panelShader">
+				<object name="infoTickerData" type="list" style="InfoTickerList" size = "0 0 100% 100%"/>
+			</object>
+
+			<!-- Contextual panel -->
+			<object name="contextPanel" size="0 0 250 200" hidden="true" type="image" sprite="panelShader">
+				<object name="contextPanelText" type="text" style="ModernLabelText" size="0 0 100% 100%" />
+				<object name="contextPanelButton[0]" type="button" style="StoneButtonFancy"
+					size="20 100%-40 100%-20 100%-12"/>
+			</object>
+
 			<!-- Event panel -->
 			<object z="600" name="eventPanel" hidden="true" size="20% 20% 80% 80%" type="image" sprite="panelShader">
 				<object name="eventPanelTitle" style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">

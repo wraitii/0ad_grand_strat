@@ -1,1 +1,1 @@
-{"code": "illyria", "links": ["friuli", "macedonia"], "hash": 43017178, "centerpoint": [894, 838], "name": "Illyria", "mapTypes": ["coastal+medit", "mountainous+medit_temp"]}
+{"code": "illyria", "links": ["friuli", "macedonia"], "hash": 43017178, "centerpoint": [894, 838], "name": "Illyria", "mapTypes": ["coastal+medit", "mountainous+medit_temp"], "civs": ["mace", "gaul"]}
