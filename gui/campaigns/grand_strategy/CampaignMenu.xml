@@ -5,6 +5,8 @@
 	<script directory="gui/gamesettings/"/>
 	<script directory="gui/gamesettings/attributes/"/>
 	<script directory="gui/campaigns/grand_strategy/"/>
+	<!-- Load events after event.js is loaded-->
+	<script directory="gui/campaigns/grand_strategy/events/"/>
 
 	<object z="0" type="image" sprite="campaignBackground" size="0 0 100% 100%" name="campaignMenuWindow">
 

@@ -1,1 +1,1 @@
-{"code": "brittany", "hash": 37077251, "links": ["aquitania", "normandy"], "centerpoint": [318, 666], "name": "Brittany", "mapTypes": [], "civs": ["gaul", "brit"]}
+{"code": "brittany", "hash": 37077251, "links": ["aquitania", "normandy"], "centerpoint": [318, 666], "name": "Brittany", "mapTypes": ["coastal+temp"], "civs": ["gaul", "brit"]}

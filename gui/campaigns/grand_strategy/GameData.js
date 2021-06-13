@@ -32,13 +32,22 @@ class GameData
 		for (const prov in this.provinces)
 			pv[prov] = this.provinces[prov].Serialize();
 
+		const pastEvents = [];
+		for (const evs of this.pastTurnEvents)
+		{
+			const t = [];
+			for (const event of evs)
+				t.push(event.serialize());
+			pastEvents.push(t);
+		}
+
 		return {
 			"turn": this.turn,
 			"playerTribe": this.playerTribe,
 			"playerHero": this.playerHero.Serialize(),
 			"tribes": tribes,
 			"provinces": pv,
-			"events": this.pastTurnEvents
+			"events": pastEvents
 		};
 	}
 
@@ -58,7 +67,18 @@ class GameData
 		this.playerHero = new Hero();
 		this.playerHero.Deserialize(data.playerHero);
 
-		this.pastTurnEvents = data.events || [];
+		this.pastTurnEvents = [];
+		for (const evs of data.events)
+		{
+			const t = [];
+			for (const event of evs)
+			{
+				const ev = GSEvent.CreateFromSerialized(event);
+				ev.deserialize(event);
+				t.push(ev);
+			}
+			this.pastTurnEvents.push(t);
+		}
 	}
 
 	static createNewGame()
@@ -282,28 +302,19 @@ class GameData
 					{
 						// too annoying when testing.
 						continue;
-						this.turnEvents.push({
-							"type": "attack",
-							"data": {
-								"attacker": code,
-								"target": target
-							}
-						});
+						this.turnEvents.push(new GSAttack({
+							"attacker": code,
+							"target": target
+						}));
 					}
 					else
 					{
 						// TODO: simulate fighting.
 						province.setOwner(code);
-						this.turnEvents.push({
-							"type": "conquest",
-							"data": {
-								"attacker": code,
-								"target": target
-							},
-							"ticker": {
-								"text": "%(attacker)s has conquered %(target)s"
-							}
-						});
+						this.turnEvents.push(new GSConquest({
+							"attacker": code,
+							"target": target
+						}));
 					}
 				}
 			}
@@ -315,7 +326,14 @@ class GameData
 
 			this.playerHero.actionsLeft = Math.min(2, this.playerHero.actionsLeft + 1);
 
-			this.pastTurnEvents.push(clone(this.turnEvents));
+			const evs = [];
+			for (const ev of this.turnEvents)
+			{
+				const copy = new ev.constructor();
+				copy.deserialize(ev.serialize());
+				evs.push(copy);
+			}
+			this.pastTurnEvents.push(evs);
 
 			this.save();
 			return true;

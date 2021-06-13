@@ -1,1 +1,1 @@
-{"code": "bythnia", "links": ["pontus", "thrace", "ionia", "phrygia"], "hash": 105234121, "centerpoint": [1299, 976], "name": "Bythnia", "mapTypes": [], "civs": ["pers"]}
+{"code": "bythnia", "links": ["pontus", "thrace", "ionia", "phrygia"], "hash": 105234121, "centerpoint": [1299, 976], "name": "Bythnia", "mapTypes": ["coastal+temp"], "civs": ["pers"]}

@@ -23,13 +23,14 @@ class InfoTicker
 	{
 		for (const event of events)
 		{
-			if (!event.ticker)
+			const text = event.getTickerText();
+			if (!text)
 				continue;
 			this.messages.push({
 				"turn": turn,
-				"text": sprintf(event.ticker.text, event.data)
+				"text": text
 			});
-			this.panelData.addItem(sprintf("• Turn %s: ", turn) + this.messages[this.messages.length - 1].text);
+			this.panelData.addItem(sprintf("• Turn %s: ", turn) + text);
 		}
 	}
 }
