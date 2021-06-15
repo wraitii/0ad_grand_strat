@@ -1,6 +1,5 @@
 {
 	"Name": "Grand Strategy",
 	"Description": "Take control of a nation, conquer your neighbors, rule the world.",
-	"Image": "session/icons/mappreview/Introductory_Tutorial.png",
 	"Interface": "grand_strategy"
 }

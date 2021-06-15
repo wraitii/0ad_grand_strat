@@ -1,8 +1,8 @@
 {
-	"name": "grand_strategy",
-	"version": "0.0.0",
+	"name": "grand_strat",
+	"version": "0.1.0",
 	"label": "Grand Strategy",
-	"url": "github.com/wraitii/grand_strategy",
+	"url": "github.com/wraitii/0ad_grand_strat",
 	"description": "Some UX improvements tests",
 	"dependencies": ["0ad=0.0.25"],
 	"ignoreInCompatibilityChecks": true
