@@ -27,13 +27,18 @@ class MapTypes
 		let maps = [];
 		let sp = spec;
 		let nextToken = sp.search(/\+/);
+		if (nextToken === -1)
+			nextToken = sp.length;
 		while (sp.length)
 		{
 			const token = sp.substring(0, nextToken);
-			sp = sp.substring(nextToken+1);
+			sp = sp.substring(nextToken + 1);
+			nextToken = sp.search(/\+/);
+			if (nextToken === -1)
+				nextToken = sp.length;
 			if (!(token in this.mapTypes))
 			{
-				warn("Unknow map type " + token);
+				warn("Unknow map type '" + token + "'");
 				break;
 			}
 			biomes = biomes.concat(this.mapTypes[token].data.biomes ?? []);
