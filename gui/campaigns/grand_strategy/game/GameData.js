@@ -57,11 +57,15 @@ class GameData
 
 		this.turn = data.turn;
 
-		for (let prov in data.provinces)
+		for (const prov in data.provinces)
 			this.provinces[prov].Deserialize(data.provinces[prov]);
 
-		for (let code in data.tribes)
+		for (const code in data.tribes)
+		{
+			if (data.tribes[code].customTribeData)
+				this.tribes[code] = new Tribe(data.tribes[code].customTribeData, true);
 			this.tribes[code].Deserialize(data.tribes[code]);
+		}
 
 		this.playerTribe = data.playerTribe;
 		this.playerHero = new Hero();
@@ -81,12 +85,11 @@ class GameData
 		}
 	}
 
-	static createNewGame()
+	static createNewGame(playerData)
 	{
-		let game = new GameData();
-		g_GameData = game;
-		game.initialiseGame();
-		return game;
+		g_GameData = new GameData();
+		g_GameData.initialiseGame(playerData);
+		return g_GameData;
 	}
 
 	static loadRun()
@@ -113,23 +116,31 @@ class GameData
 		CampaignRun.getCurrentRun().save();
 	}
 
-	initialiseGame()
+	initialiseGame(playerData)
 	{
 		this.parseHistory();
 
+		// Create human player
+		this.tribes.player = new Tribe({
+			"code": "player",
+			"civ": playerData.civ,
+			"name": playerData.tribeName,
+		}, true);
+		this.provinces[playerData.startProvince].setOwner("player");
+		this.playerTribe = "player";
+		// TODO: hero name
+		this.playerHero = new Hero("player", playerData.startProvince);
+
 		// Assign tribe initial provinces
-		for (let code in this.tribes)
+		for (const code in this.tribes)
 		{
-			let tribe = this.tribes[code];
+			const tribe = this.tribes[code];
 			if (!tribe.data.startProvinces)
 				continue;
-			for (let prov of tribe.data.startProvinces)
-				this.provinces[prov].setOwner(code);
+			for (const prov of tribe.data.startProvinces)
+				if (prov !== playerData.startProvince)
+					this.provinces[prov].setOwner(code);
 		}
-
-		// Create human player
-		this.playerTribe = "athens";
-		this.playerHero = new Hero("athens", "thessalia");
 
 		this.save();
 	}

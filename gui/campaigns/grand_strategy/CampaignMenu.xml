@@ -4,9 +4,13 @@
 	<script file="gui/maps/MapCache.js"/>
 	<script directory="gui/gamesettings/"/>
 	<script directory="gui/gamesettings/attributes/"/>
-	<script directory="gui/campaigns/grand_strategy/"/>
+
+	<!-- Game data scripts loaded first. -->
+	<script directory="gui/campaigns/grand_strategy/game/"/>
 	<!-- Load events after event.js is loaded-->
-	<script directory="gui/campaigns/grand_strategy/events/"/>
+	<script directory="gui/campaigns/grand_strategy/game/events/"/>
+	<!-- UI stuff - z_init is last. -->
+	<script directory="gui/campaigns/grand_strategy/"/>
 
 	<object z="0" type="image" sprite="campaignBackground" size="0 0 100% 100%" name="campaignMenuWindow">
 

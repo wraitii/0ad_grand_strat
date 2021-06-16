@@ -3,12 +3,16 @@
  */
 class Tribe
 {
-	constructor(data)
+	constructor(data, isCustomTribe)
 	{
 		this.code = data.code;
 		this.data = data;
 
 		this.color = data.color || "255 0 0";
+
+		// Custom tribes don't have associated JSON data, so we need to serialize more.
+		if (isCustomTribe)
+			this.customTribeData = data;
 
 		this.controlledProvinces = [];
 		this.civ = data.civ;
@@ -19,11 +23,14 @@ class Tribe
 
 	Serialize()
 	{
-		return {
+		const ret = {
 			"money": this.money,
 			"lastBalance": this.lastBalance || 0,
 			"civ": this.civ,
 		};
+		if (this.customTribeData)
+			ret.customTribeData = this.customTribeData;
+		return ret;
 	}
 
 	Deserialize(data)
@@ -32,7 +39,8 @@ class Tribe
 		this.lastBalance = data.lastBalance;
 		this.civ = data.civ;
 
-		for (let prov in g_GameData.provinces)
+		// TODO: do this better.
+		for (const prov in g_GameData.provinces)
 			if (g_GameData.provinces[prov].ownerTribe === this.code)
 				this.controlledProvinces.push(prov);
 	}

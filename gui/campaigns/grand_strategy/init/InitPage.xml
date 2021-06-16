@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<objects>
+	<script directory="gui/campaigns/grand_strategy/game/"/>
+
+	<script directory="gui/campaigns/grand_strategy/init/"/>
+
+	<object type="image" size="0 0 100% 100%" style="ModernWindow" name="initPageWindow">
+
+		<object name="abortButton" type="button" size="32 100%-60 300 100%-32" style="StoneButtonFancy"/>
+
+		<object type="image" size="50%-400 80 50%+400 100%-80" sprite="panelShader" name="initSubPanel">
+			<object name="page1" size="16 0 100%-16 466">
+				<object name="campaignTitle" type="text" style="ModernLabelText" size="0 8 100% 32"/>
+				<object name="campaignDescription" type="text" style="ModernLabelText" size="0 48 100% 196"/>
+				<object name="campaignImage" type="image" size="0 200 100% 450"/>
+				<object name="page1Button" hidden="true" type="button" size="100%-240 100%-28 100% 100%" style="StoneButtonFancy"/>
+			</object>
+
+			<object name="page2" size="16 466 100%-16 100%">
+				<object size="16 0 100%-16 110">
+					<object name="playerSettings" type="text" size="0 0 100% 32" style="ModernLabelText"/>
+					<object size="0 40 100% 66">
+						<object name="civSelectLabel" type="text" size="0 0 140 100%" style="ModernLabelText"/>
+						<object name="civSelect" type="dropdown" size="144 0 340 100%" style="ModernDropDown"/>
+						<object name="heroNameLabel" type="text" size="100%-350 0 100%-250 100%" style="ModernLabelText"/>
+						<object name="heroName" type="input" size="100%-246 0 100% 100%" style="ModernInput"/>
+					</object>
+					<object size="0 80 100% 106">
+						<object name="provinceSelectLabel" type="text" size="0 0 140 100%" style="ModernLabelText"/>
+						<object name="provinceSelect" type="dropdown" size="144 0 340 100%" style="ModernDropDown"/>
+						<object name="tribeNameLabel" type="text" size="100%-350 0 100%-250 100%" style="ModernLabelText"/>
+						<object name="tribeName" type="input" size="100%-246 0 100% 100%" style="ModernInput"/>
+					</object>
+				</object>
+				<object size="16 118 100%-16 100%-16">
+					<object name="gameSettings" type="text" size="0 0 100% 32" style="ModernLabelText"/>
+					<object size="0 40 100% 66">
+						<object name="difficultySelectLabel" type="text" size="0 0 140 100%" style="ModernLabelText"/>
+						<object name="difficultySelect" type="dropdown" size="144 0 340 100%" style="ModernDropDown"/>
+					</object>
+				</object>
+				<object size="16 100%-40 100%-16 100%-16">
+					<object name="feedbackText" type="text" size="0 0 100%-140 32" style="ModernText"/>
+					<object name="startButton" type="button" size="100%-240 100%-28 100% 100%" style="StoneButtonFancy"/>
+				</object>
+			</object>
+		</object>
+	</object>
+</objects>

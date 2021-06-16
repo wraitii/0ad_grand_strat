@@ -32,9 +32,6 @@ class CampaignMenu
 		if (this.run.data.gameData)
 			GameData.loadRun();
 
-		if (!g_GameData)
-			GameData.createNewGame();
-
 		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
 		this.cameraX = pos[0] - 400;
 		this.cameraZ = pos[1] - 400;
@@ -250,22 +247,5 @@ class CampaignMenu
 	toGUISize(x0, z0, x1, z1)
 	{
 		return `${x0 - this.cameraX} ${z0 - this.cameraZ} ${x1 - this.cameraX} ${z1 - this.cameraZ}`;
-	}
-}
-
-var g_CampaignMenu;
-
-function init(initData)
-{
-	let run = initData?.filename || CampaignRun.getCurrentRunFilename();
-	try {
-		run = new CampaignRun(run).load();
-		run.setCurrent();
-		g_CampaignMenu = new CampaignMenu(run);
-		g_CampaignMenu.initialise();
-	} catch (err) {
-		error(sprintf(translate("Error loading campaign run %s: %s."), CampaignRun.getCurrentRunFilename(), err));
-		error(err.stack.toString());
-		Engine.SwitchGuiPage("page_pregame.xml", {});
 	}
 }
