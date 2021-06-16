@@ -15,7 +15,7 @@ class InitPage
 		desc += "\nWelcome to 0 A.D.'s Grand Strategy campaign, where you will take control of a country through the eyes of a Hero character. Fortify your lands, conquer your neighbors, and lead your civilization to victory.";
 		Engine.GetGUIObjectByName("campaignDescription").caption = desc;
 
-		Engine.GetGUIObjectByName("campaignImage").sprite = "color:0 0 0";
+		Engine.GetGUIObjectByName("campaignImage").sprite = "stretched:campaigns/grand_strategy/art/banner.png";
 
 		Engine.GetGUIObjectByName("playerSettings").caption = "Customize your civilization";
 
@@ -47,6 +47,13 @@ class InitPage
 		this.difficultySelect.list = ["Easy", "Medium", "Hard"];
 		this.difficultySelect.list_data = ["easy", "medium", "hard"];
 		this.difficultySelect.selected = 0;
+		this.difficultySelect.onHoverChange = () => {
+			this.difficultySelect.tooltip = [
+				"AI players will range from Sandbox to Easy difficulty",
+				"AI players will range from Easy to Hard difficulty",
+				"AI players will range from Medium to Very Hard difficulty",
+			]?.[this.difficultySelect.hovered] ?? "";
+		};
 
 		this.customHeroName = false;
 		this.customTribeName = false;
@@ -141,10 +148,11 @@ class InitPage
 				"width": 450,
 				"height": 200,
 				"title": "Start Campaign?",
-				"message": sprintf("You have chosen to start a campaign as the %(tribe)s of the %(civ)s.\nConfirm?",
+				"message": sprintf("You have chosen to start a campaign as a %(civ)s tribe called the “%(tribe)s”, in %(prov)s.\nConfirm?",
 					{
 						"tribe": this.tribeName.caption,
 						"civ": this.civSelect.list[this.civSelect.selected],
+						"prov": this.provinceSelect.list[this.provinceSelect.selected],
 					}),
 				"buttonCaptions": ["No", "Yes"],
 			},
@@ -155,10 +163,12 @@ class InitPage
 	{
 		// Writes g_GameData
 		GameData.createNewGame({
-			"civ": this.civSelect.list_data[this.civSelect.selected],
-			"tribeName": this.tribeName.caption,
-			"startProvince": this.provinceSelect.list_data[this.provinceSelect.selected],
-		});
+				"civ": this.civSelect.list_data[this.civSelect.selected],
+				"tribeName": this.tribeName.caption,
+				"startProvince": this.provinceSelect.list_data[this.provinceSelect.selected],
+			},
+			this.difficultySelect.list_data[this.difficultySelect.selected]
+		);
 		Engine.SwitchGuiPage("campaigns/grand_strategy/page.xml", {
 			"filename": CampaignRun.getCurrentRunFilename()
 		});

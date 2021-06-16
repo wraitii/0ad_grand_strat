@@ -11,6 +11,8 @@ class GameData
 		this.provinces = {};
 		this.tribes = {};
 
+		this.difficulty = "medium";
+
 		this.playerTribe = undefined;
 		this.playerHero = undefined;
 
@@ -45,6 +47,7 @@ class GameData
 			"turn": this.turn,
 			"playerTribe": this.playerTribe,
 			"playerHero": this.playerHero.Serialize(),
+			"difficulty": this.difficulty,
 			"tribes": tribes,
 			"provinces": pv,
 			"events": pastEvents
@@ -71,6 +74,9 @@ class GameData
 		this.playerHero = new Hero();
 		this.playerHero.Deserialize(data.playerHero);
 
+		if (data.difficulty)
+			this.difficulty = data.difficulty;
+
 		this.pastTurnEvents = [];
 		for (const evs of data.events)
 		{
@@ -87,10 +93,10 @@ class GameData
 			this.turnEvents = this.pastTurnEvents[this.pastTurnEvents.length - 1];
 	}
 
-	static createNewGame(playerData)
+	static createNewGame(playerData, difficulty)
 	{
 		g_GameData = new GameData();
-		g_GameData.initialiseGame(playerData);
+		g_GameData.initialiseGame(playerData, difficulty);
 		return g_GameData;
 	}
 
@@ -118,7 +124,7 @@ class GameData
 		CampaignRun.getCurrentRun().save();
 	}
 
-	initialiseGame(playerData)
+	initialiseGame(playerData, difficulty)
 	{
 		this.parseHistory();
 
@@ -143,6 +149,8 @@ class GameData
 				if (prov !== playerData.startProvince)
 					this.provinces[prov].setOwner(code);
 		}
+
+		this.difficulty = difficulty;
 
 		this.save();
 	}
@@ -228,7 +236,7 @@ class GameData
 		let aiID = 1 - playerID;
 		gameSettings.playerAI.set(aiID, {
 			"bot": "petra",
-			"difficulty": playerIsAttacker ? province.garrison / 2 : 5 - province.garrison / 2,
+			"difficulty": this.getAIDifficulty(province.garrison, playerIsAttacker),
 			"behavior": "random",
 		});
 		gameSettings.playerCiv.setValue(0, this.tribes[attackerTribe].civ);
@@ -251,6 +259,13 @@ class GameData
 			"attribs": gameSettings.toInitAttributes(),
 			"playerAssignments": assignments
 		});
+	}
+
+	getAIDifficulty(garrison, playerIsAttacker)
+	{
+		const max = this.difficulty === "easy" ? 2 : this.difficulty == "medium" ? 4 : 5;
+		const min = this.difficulty === "easy" ? 0 : this.difficulty == "medium" ? 2 : 3;
+		return Math.max(min, Math.min(max, playerIsAttacker ? min + garrison : max - garrison));
 	}
 
 	changeGarrison(provinceCode, delta)
@@ -301,11 +316,16 @@ class GameData
 				let tribe = this.tribes[code];
 				let targets = new Set();
 				for (let prov of tribe.controlledProvinces)
-					for (let pot of g_GameData.provinces[prov].getLinks())
+				{
+					const pv = g_GameData.provinces[prov];
+					if (pv.garrison < 2)
+						pv.garrison++;
+					for (let pot of pv.getLinks())
 					{
-						if (g_GameData.provinces[pot].ownerTribe !== code)
+						if (pv.ownerTribe !== code)
 							targets.add(pot);
 					}
+				}
 
 				if (randBool(0.5) && targets.size)
 				{
