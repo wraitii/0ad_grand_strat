@@ -321,12 +321,9 @@ class GameData
 					if (pv.garrison < 2)
 						pv.garrison++;
 					for (let pot of pv.getLinks())
-					{
-						if (pv.ownerTribe !== code)
+						if (g_GameData.provinces[pot].ownerTribe !== code)
 							targets.add(pot);
-					}
 				}
-
 				if (randBool(0.5) && targets.size)
 				{
 					let target = pickRandom(Array.from(targets));
