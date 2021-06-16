@@ -7,6 +7,9 @@ My focus is a bit more limited: I want the player to control a single Hero chara
 
 See the 'Issues' of this repository for some more information on the direction of Gameplay.
 
+## Screenshots
+<img width="350" alt="Main Screen" src="https://user-images.githubusercontent.com/1927071/122226887-ab67ac00-ceb6-11eb-8e40-4c2c6a009aaf.png" /> <img width="350" alt="Setup Screen" src="https://user-images.githubusercontent.com/1927071/122226907-af93c980-ceb6-11eb-9e2a-1e48c9bb5e2d.png" />
+
 ## Changelog & Current Status
 
 It's sort of playable, but the UI is not great™.
@@ -20,12 +23,6 @@ It's sort of playable, but the UI is not great™.
 
 ### v0.1
 Initial reveal - sorta playable, but not really.
-
-## Screenshots
-<img width="350" alt="Main Screen" src="https://user-images.githubusercontent.com/1927071/122226887-ab67ac00-ceb6-11eb-8e40-4c2c6a009aaf.png" /> <img width="350" alt="Setup Screen" src="https://user-images.githubusercontent.com/1927071/122226907-af93c980-ceb6-11eb-9e2a-1e48c9bb5e2d.png" />
-
-
-## Changelog
 
 ## Structure
 

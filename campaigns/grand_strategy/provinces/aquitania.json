@@ -1,1 +1,1 @@
-{"code": "aquitania", "hash": 202202228, "links": ["brittany", "basque", "cisalpine_gaul", "central_gaul", "iberia"], "centerpoint": [394, 810], "name": "Aquitania", "mapTypes": ["coastal+temp"], "civs": ["gaul", "iber"]}
+{"code": "aquitania", "hash": 202202228, "links": ["iberia", "cisalpine_gaul", "brittany", "central_gaul", "basque"], "centerpoint": [394, 810], "name": "Aquitania", "mapTypes": ["coastal+temp"], "civs": ["gaul", "iber"]}

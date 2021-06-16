@@ -13,6 +13,8 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("finishTurn").onPress = () => this.doFinishTurn();
 		Engine.GetGUIObjectByName('backToMain').onPress = () => this.goBackToMainMenu();
 
+		Engine.GetGUIObjectByName('loadSaveButton').onPress = () => this.openLoadSave(true);
+
 		this.infoTicker = new InfoTicker();
 		this.eventPanel = new EventPanel();
 
@@ -46,6 +48,13 @@ class CampaignMenu
 	{
 		g_GameData.save();
 		Engine.SwitchGuiPage("page_pregame.xml", {});
+	}
+
+	openLoadSave()
+	{
+		Engine.PushGuiPage("campaigns/grand_strategy/loadsave/page.xml", {
+			"gameData": g_GameData.Serialize(),
+		});
 	}
 
 	doFinishTurn()
@@ -167,7 +176,7 @@ class CampaignMenu
 			return;
 		}
 		this.selectedProvince = code;
-		const pos = g_GameData.provinces[code].getHeroPos();
+		const pos = [this.mouseX+this.cameraX, this.mouseY+this.cameraZ];
 		Engine.GetGUIObjectByName("contextPanel").size = this.toGUISize(...pos, pos[0] + 250, pos[1] + 200);
 		Engine.GetGUIObjectByName("contextPanel").hidden = false;
 
@@ -176,7 +185,7 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("contextPanelButton[0]").onPress = () => {
 			g_GameData.playerHero.doMove(code);
 			this.displayContextualPanel(-1);
-		}
+		};
 		Engine.GetGUIObjectByName("contextPanelButton[0]").caption="Move there"
 	}
 

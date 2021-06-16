@@ -25,12 +25,12 @@
 		<!-- UI -->
 		<object z="100">
 			<!-- Top panel -->
-			<object name="topPanel" type="image" sprite="panelShader" size="0 0 100% 50">
+			<object name="topPanel" type="image" sprite="panelShader" size="0 0 600 50">
 				<object name="topPanelText" type="text" style="ModernLabelText" size="0 0 100% 100%" />
 			</object>
 
 			<!-- Hero panel -->
-			<object name="heroDetails" size="100%-300 100 100% 300" type="image" sprite="panelShader">
+			<object name="heroDetails" size="0 100 300 300" type="image" sprite="panelShader">
 				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
 					<translatableAttribute id="caption">Hero Details</translatableAttribute>
 				</object>
@@ -48,7 +48,7 @@
 			</object>
 
 			<!-- Province detail panel -->
-			<object name="provinceDetails" size="100%-300 350 100% 650" type="image" sprite="panelShader">
+			<object name="provinceDetails" size="0 350 300 650" type="image" sprite="campaignBackground">
 				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
 					<translatableAttribute id="caption">Province Details</translatableAttribute>
 				</object>
@@ -60,7 +60,7 @@
 			</object>
 
 			<!-- Tribe detail panel -->
-			<object name="tribeDetails" size="100%-300 350 100% 650" hidden="true" type="image" sprite="panelShader">
+			<object name="tribeDetails" size="0 350 300 650" hidden="true" type="image" sprite="campaignBackground">
 				<object style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
 					<translatableAttribute id="caption">Tribe Details</translatableAttribute>
 				</object>
@@ -74,7 +74,7 @@
 			</object>
 
 			<!-- Contextual panel -->
-			<object name="contextPanel" size="0 0 250 200" hidden="true" type="image" sprite="panelShader">
+			<object name="contextPanel" size="0 0 250 200" hidden="true" type="image" sprite="campaignBackground">
 				<object name="contextPanelText" type="text" style="ModernLabelText" size="0 0 100% 100%" />
 				<object name="contextPanelButton[0]" type="button" style="StoneButtonFancy"
 					size="20 100%-40 100%-20 100%-12"/>
@@ -92,13 +92,18 @@
 				</object>
 			</object>
 
-			<object name="bottomPanel" size="30 100%-55 100%-5 100%-25" >
-
+			<object name="menuBar" size="100%-200 0 100% 120">
 				<!-- Exit & Back to Main Menu -->
-				<object name="backToMain" type="button" style="StoneButton" size="0 0 17% 100%">
-					<translatableAttribute id="caption">Back to Main Menu</translatableAttribute>
+				<object name="backToMain" type="button" style="StoneButtonFancy" size="0 8 100%-8 36">
+					<translatableAttribute id="caption">Autosave and Exit</translatableAttribute>
 				</object>
+				<object name="loadSaveButton" type="button" style="StoneButtonFancy" size="0 44 100%-8 72">
+					<translatableAttribute id="caption">Load / Save</translatableAttribute>
+				</object>
+			</object>
 
+
+			<object name="bottomPanel" size="30 100%-55 100%-5 100%-25" >
 				<object name="finishTurn" type="button" style="StoneButtonFancy" size="83%-25 0 100%-25 100%" enabled="false">
 					<translatableAttribute id="caption">Finish Turn</translatableAttribute>
 				</object>
@@ -111,7 +116,7 @@
 			<repeat count="40">
 				<object name="mapProvince[n]" hidden="true">
 					<object z="10" type="button" name="mapProvinceSprite[n]" sprite="" size="200 200 300 300"/>
-					<object z="20" type="button" name="mapProvinceCity[n]" sprite="color:0 0 0 50:textureAsMask:stretched:session/icons/construction.png" hidden="true" size="0 0 16 16"/>
+					<object z="20" type="button" name="mapProvinceCity[n]" ghost="true" sprite="color:0 0 0 50:textureAsMask:stretched:session/icons/construction.png" hidden="true" size="0 0 16 16"/>
 				</object>
 			</repeat>
 

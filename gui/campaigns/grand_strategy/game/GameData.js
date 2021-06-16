@@ -118,10 +118,10 @@ class GameData
 		return game;
 	}
 
-	save()
+	save(run = CampaignRun.getCurrentRun())
 	{
-		CampaignRun.getCurrentRun().data.gameData = this.Serialize();
-		CampaignRun.getCurrentRun().save();
+		run.data.gameData = this.Serialize();
+		run.save();
 	}
 
 	initialiseGame(playerData, difficulty)

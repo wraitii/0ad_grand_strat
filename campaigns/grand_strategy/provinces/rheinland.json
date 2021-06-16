@@ -1,1 +1,1 @@
-{"code": "rheinland", "hash": 145163062, "links": ["central_gaul", "cisalpine_gaul", "normandy"], "centerpoint": [547, 676], "name": "Rheinland", "mapTypes": [], "civs": ["gaul"]}
+{"code": "rheinland", "hash": 145163062, "links": ["normandy", "central_gaul", "cisalpine_gaul"], "centerpoint": [547, 676], "name": "Rheinland", "mapTypes": [], "civs": ["gaul"]}

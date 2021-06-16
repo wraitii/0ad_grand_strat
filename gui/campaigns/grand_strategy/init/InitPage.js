@@ -162,15 +162,20 @@ class InitPage
 	actuallyStart()
 	{
 		// Writes g_GameData
-		GameData.createNewGame({
+		GameData.createNewGame(
+			{
 				"civ": this.civSelect.list_data[this.civSelect.selected],
 				"tribeName": this.tribeName.caption,
 				"startProvince": this.provinceSelect.list_data[this.provinceSelect.selected],
 			},
 			this.difficultySelect.list_data[this.difficultySelect.selected]
 		);
+		const run = CampaignRun.getCurrentRun();
+		// Use the original filename to track all files of this particular GS run.
+		run.meta.gs_identifier = run.filename;
+		run.save();
 		Engine.SwitchGuiPage("campaigns/grand_strategy/page.xml", {
-			"filename": CampaignRun.getCurrentRunFilename()
+			"filename": run.filename
 		});
 	}
 

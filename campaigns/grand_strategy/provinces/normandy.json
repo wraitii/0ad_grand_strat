@@ -1,1 +1,1 @@
-{"code": "normandy", "hash": 238148049, "links": ["central_gaul", "london", "rheinland", "brittany"], "centerpoint": [410, 621], "name": "Normandy", "mapTypes": [], "civs": ["gaul", "brit"]}
+{"code": "normandy", "hash": 238148049, "links": ["london", "brittany", "rheinland", "central_gaul"], "centerpoint": [410, 621], "name": "Normandy", "mapTypes": [], "civs": ["gaul", "brit"]}
