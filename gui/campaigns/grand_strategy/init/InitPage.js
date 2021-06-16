@@ -2,12 +2,17 @@ class InitPage
 {
 	constructor()
 	{
+		this.civs = this.loadCivData();
+		this.provinces = this.loadProvinces();
+
+		// UI setup.
+
 		Engine.GetGUIObjectByName("abortButton").caption="Back to Main Menu";
 		Engine.GetGUIObjectByName("abortButton").onPress = () => Engine.SwitchGuiPage("page_pregame.xml", {});
 
 		Engine.GetGUIObjectByName("campaignTitle").caption = "Grand Strategy";
 		let desc = "Destined for glory? Ever since you were young, you've had the spirit of a warrior. A strong soul, and the right combination of will, luck and destiny to wield it effectively. Now your people look to you to guide them into the future, whatever may come.";
-		desc += "\nWelcome to 0 A.D.'s Grand Strategy campaign, where you will take control of a country through the eyes of a Hero character. Fortify your lands, conquer your neighbors, and lead your civilization to victory."
+		desc += "\nWelcome to 0 A.D.'s Grand Strategy campaign, where you will take control of a country through the eyes of a Hero character. Fortify your lands, conquer your neighbors, and lead your civilization to victory.";
 		Engine.GetGUIObjectByName("campaignDescription").caption = desc;
 
 		Engine.GetGUIObjectByName("campaignImage").sprite = "color:0 0 0";
@@ -33,15 +38,22 @@ class InitPage
 
 		this.civSelect.onSelectionChange = () => this.onCivPick();
 
-		this.civSelect.list = ["Athens", "Sparta"];
-		this.civSelect.list_data = ["athen", "spart"];
+		this.civSelect.list = Object.values(this.civs).map(x => x.Name);
+		this.civSelect.list_data = Object.values(this.civs).map(x => x.Code);
 
-		this.provinceSelect.list = ["Peloponnese", "Crete", "Latium"];
-		this.provinceSelect.list_data = ["peloponnese", "crete", "latium"];
+		this.provinceSelect.list = this.provinces.map(x => x.name);
+		this.provinceSelect.list_data = this.provinces.map(x => x.code);
 
 		this.difficultySelect.list = ["Easy", "Medium", "Hard"];
 		this.difficultySelect.list_data = ["easy", "medium", "hard"];
 		this.difficultySelect.selected = 0;
+
+		this.customHeroName = false;
+		this.customTribeName = false;
+		this.customProvince = false;
+		this.heroName.onTextEdit = () => { this.customHeroName = true; };
+		this.tribeName.onTextEdit = () => { this.customTribeName = true; };
+		this.provinceSelect.onSelectionChange = () => { this.customProvince = true; };
 
 		const page = Engine.GetGUIObjectByName("initPageWindow");
 		const pageSize = page.getComputedSize();
@@ -74,12 +86,15 @@ class InitPage
 
 	onCivPick()
 	{
-		if (this.provinceSelect.selected === -1)
-			this.provinceSelect.selected = 0;
-		if (!this.heroName.caption)
-			this.heroName.caption = "Vercingetorix";
-		if (!this.tribeName.caption)
-			this.tribeName.caption = "Romans";
+		if (this.provinceSelect.selected === -1 || !this.customProvince)
+		{
+			this.provinceSelect.selected = this.getDefaultStartingProvince(this.civSelect.list_data[this.civSelect.selected]);
+			this.customProvince = false; // Need to reset this.
+		}
+		if (!this.heroName.caption || !this.customHeroName)
+			this.heroName.caption = pickRandom(this.civs[this.civSelect.list_data[this.civSelect.selected]].AINames);
+		if (!this.tribeName.caption || !this.customTribeName)
+			this.tribeName.caption = this.civSelect.list[this.civSelect.selected];
 	}
 
 	render()
@@ -147,6 +162,36 @@ class InitPage
 		Engine.SwitchGuiPage("campaigns/grand_strategy/page.xml", {
 			"filename": CampaignRun.getCurrentRunFilename()
 		});
+	}
+
+	loadCivData()
+	{
+		const civData = loadCivFiles(true); // Selectables only.
+		translateObjectKeys(civData, ["Name", "Description", "History", "Special"]);
+		return civData;
+	}
+
+	loadProvinces()
+	{
+		const files = Engine.ListDirectoryFiles("campaigns/grand_strategy/provinces/", "**.json", false);
+		return files.map(x => Engine.ReadJSONFile(x));
+	}
+
+	getDefaultStartingProvince(code)
+	{
+		return this.provinces.findIndex(x => x.code === {
+			"athen": "thessalia",
+			"brit": "london",
+			"cart": "carthage",
+			"gaul": "central_gaul",
+			"iber": "iberia",
+			"mace": "macedonia",
+			"pers": "phrygia",
+			"ptol": "nile_delta",
+			"rome": "latium",
+			"sele": "thrace",
+			"spart": "peloponnese",
+		}[code]);
 	}
 }
 

@@ -1,0 +1,7 @@
+{
+	"code": "mace",
+	"name": "Macedonia",
+	"civ": "mace",
+	"color": "0 255 255",
+	"startProvinces": ["macedonia"]
+}

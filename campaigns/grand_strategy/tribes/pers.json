@@ -1,0 +1,7 @@
+{
+	"code": "pers",
+	"name": "Persians",
+	"civ": "pers",
+	"color": "180 30 255",
+	"startProvinces": ["pontus"]
+}

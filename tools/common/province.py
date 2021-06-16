@@ -13,7 +13,8 @@ class Province:
         self.code = code
         self.art = None
         self.history = {
-            "code": code
+            "code": code,
+            "name": code,
         }
         self.surface = pygame.Surface((PROV_SIZE, PROV_SIZE), pygame.SRCALPHA)
 

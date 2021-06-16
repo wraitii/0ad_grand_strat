@@ -1,0 +1,7 @@
+{
+	"code": "britons",
+	"name": "Britons",
+	"civ": "brit",
+	"color": "255 0 255",
+	"startProvinces": ["london"]
+}

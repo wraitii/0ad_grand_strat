@@ -81,13 +81,14 @@
 			</object>
 
 			<!-- Event panel -->
-			<object z="600" name="eventPanel" hidden="true" size="20% 20% 80% 80%" type="image" sprite="panelShader">
+			<object z="400" name="eventPanel" hidden="false" size="20% 20% 80% 80%" type="image" sprite="campaignBackground">
 				<object name="eventPanelTitle" style="ModernLabelText" type="text" size="50%-128 4 50%+128 36">
 					<translatableAttribute id="caption">Event!</translatableAttribute>
 				</object>
-				<object name="eventPanelDesc" type="text" style="ModernLabelText" size="0 40 100% 100%" />
-				<object name="eventPanelButton[0]" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12">
-					<translatableAttribute id="caption">Move to province</translatableAttribute>
+				<object name="eventPanelDesc" type="text" style="ModernLabelText" size="0 40 100% 100%-40" />
+				<object size="20 100%-40 100%-20 100%-12">
+					<object name="eventPanelButton[0]" type="button" style="StoneButtonFancy" size="0 0 50% 100%"/>
+					<object name="eventPanelButton[1]" type="button" style="StoneButtonFancy" size="50% 0 100% 100%"/>
 				</object>
 			</object>
 
@@ -108,12 +109,14 @@
 		<object z="10">
 			<!-- Provinces -->
 			<repeat count="40">
-				<object type="button" name="mapProvince[n]" sprite="" hidden="true" size="200 200 300 300">
+				<object name="mapProvince[n]" hidden="true">
+					<object z="10" type="button" name="mapProvinceSprite[n]" sprite="" size="200 200 300 300"/>
+					<object z="20" type="button" name="mapProvinceCity[n]" sprite="color:0 0 0 50:textureAsMask:stretched:session/icons/construction.png" hidden="true" size="0 0 16 16"/>
 				</object>
 			</repeat>
 
 			<!-- Hero -->
-			<object type="button" name="heroButton" sprite="stretched:session/portraits/units/gaul_hero_viridomarus.png" size="0 0 50 50"/>
+			<object type="button" z="30" name="heroButton" sprite="stretched:session/portraits/units/gaul_hero_viridomarus.png" size="0 0 50 50"/>
 		</object>
 	</object>
 </objects>

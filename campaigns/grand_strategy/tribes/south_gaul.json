@@ -1,0 +1,7 @@
+{
+	"code": "south_gaul",
+	"name": "Southern Gauls",
+	"civ": "gaul",
+	"color": "255 128 128",
+	"startProvinces": ["cisalpine_gaul"]
+}

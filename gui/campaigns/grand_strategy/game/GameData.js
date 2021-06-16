@@ -83,6 +83,8 @@ class GameData
 			}
 			this.pastTurnEvents.push(t);
 		}
+		if (this.pastTurnEvents.length)
+			this.turnEvents = this.pastTurnEvents[this.pastTurnEvents.length - 1];
 	}
 
 	static createNewGame(playerData)
@@ -311,8 +313,6 @@ class GameData
 					let province = g_GameData.provinces[target];
 					if (province.ownerTribe === this.playerTribe)
 					{
-						// too annoying when testing.
-						continue;
 						this.turnEvents.push(new GSAttack({
 							"attacker": code,
 							"target": target
@@ -337,16 +337,8 @@ class GameData
 
 			this.playerHero.actionsLeft = Math.min(2, this.playerHero.actionsLeft + 1);
 
-			const evs = [];
-			for (const ev of this.turnEvents)
-			{
-				const copy = new ev.constructor();
-				copy.deserialize(ev.serialize());
-				evs.push(copy);
-			}
-			this.pastTurnEvents.push(evs);
+			this.pastTurnEvents.push(this.turnEvents);
 
-			this.save();
 			return true;
 		}
 		return false;
@@ -358,6 +350,27 @@ class GameData
 			(!endGameData.won && !endGameData.initData.playerIsAttacker))
 			this.provinces[endGameData.initData.province].setOwner(endGameData.initData.attacker);
 		// Otherwise no change necessary, the defenders won.
+		return true;
+	}
+
+	markEventProcessed(id)
+	{
+		for (const ev of this.turnEvents)
+		{
+			if (ev.id !== id)
+				continue;
+			ev.processed = true;
+			return;
+		}
+	}
+
+	canAdvanceTurn()
+	{
+		for (const ev of this.turnEvents)
+		{
+			if (ev.needUserInput() && !ev.processed)
+				return false;
+		}
 		return true;
 	}
 }

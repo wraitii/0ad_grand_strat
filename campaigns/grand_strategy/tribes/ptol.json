@@ -1,0 +1,7 @@
+{
+	"code": "ptol",
+	"name": "Ptolemian Dynasty",
+	"civ": "ptol",
+	"color": "30 180 180",
+	"startProvinces": ["nile_delta"]
+}

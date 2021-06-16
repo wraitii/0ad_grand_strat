@@ -8,11 +8,13 @@ class CampaignMenu
 
 		this.selectedProvince = -1;
 
-		Engine.GetGUIObjectByName("campaignMenuWindow").onTick = () => this.onTick();
+		this.window = Engine.GetGUIObjectByName("campaignMenuWindow");
+		this.window.onTick = () => this.onTick();
 		Engine.GetGUIObjectByName("finishTurn").onPress = () => this.doFinishTurn();
 		Engine.GetGUIObjectByName('backToMain').onPress = () => this.goBackToMainMenu();
 
 		this.infoTicker = new InfoTicker();
+		this.eventPanel = new EventPanel();
 
 		Engine.GetGUIObjectByName("campaignMenuWindow").onMouseLeftPress = () => this.onBlur();
 		Engine.GetGUIObjectByName("campaignMenuWindow").onMouseRightPress = () => this.onBlur();
@@ -25,6 +27,8 @@ class CampaignMenu
 
 		this.cameraX = 0;
 		this.cameraZ = 0;
+
+		this.lastRender = Date.now();
 	}
 
 	initialise()
@@ -32,10 +36,7 @@ class CampaignMenu
 		if (this.run.data.gameData)
 			GameData.loadRun();
 
-		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
-		this.cameraX = pos[0] - 400;
-		this.cameraZ = pos[1] - 400;
-
+		this.centerScrollOnHero();
 		this.infoTicker.initialise();
 
 		this.render();
@@ -43,7 +44,7 @@ class CampaignMenu
 
 	goBackToMainMenu()
 	{
-		this.run.save();
+		g_GameData.save();
 		Engine.SwitchGuiPage("page_pregame.xml", {});
 	}
 
@@ -67,10 +68,14 @@ class CampaignMenu
 	onTurnComputationEnd()
 	{
 		Engine.GetGUIObjectByName("computingTurn").hidden = true;
-		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
-		this.cameraX = pos[0] - 400;
-		this.cameraZ = pos[1] - 400;
 		this.infoTicker.onTurnEnd();
+	}
+
+	centerScrollOnHero()
+	{
+		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
+		this.cameraX = pos[0] - this.window.getComputedSize().right/2;
+		this.cameraZ = pos[1] - this.window.getComputedSize().bottom/2;		
 	}
 
 	/**
@@ -93,7 +98,7 @@ class CampaignMenu
 		let province = g_GameData.provinces[this.selectedProvince];
 		Engine.GetGUIObjectByName("provinceDetailsText").caption = `` +
 		`Name: ${province.name}\n` +
-		`Owner: ${province.ownerTribe || "No-one"}\n` +
+		`Owner: ${g_GameData.tribes?.[province.ownerTribe]?.getName() || "No-one"}\n` +
 		`Garrison strength: ${province.garrison}\n` +
 		`Balance: ${province.getBalance()}\n` +
 		``;
@@ -192,7 +197,6 @@ class CampaignMenu
 		const heroIcon = Engine.GetGUIObjectByName("heroButton");
 		const pos = g_GameData.provinces[hero.location].getHeroPos();
 		heroIcon.size = this.toGUISize(...this.centeredSizeAt([16, 16], pos));
-
 		// Update provinces
 		let i = 0;
 		for (let code in g_GameData.provinces)
@@ -200,14 +204,27 @@ class CampaignMenu
 			let province = g_GameData.provinces[code];
 			if (!province.icon)
 			{
-				let icon = Engine.GetGUIObjectByName(`mapProvince[${i++}]`);
+				let icon = Engine.GetGUIObjectByName(`mapProvinceSprite[${i++}]`);
 				icon.hidden = false;
+				icon.parent.hidden = false;
 				icon.onPress = () => { this.displayTribeDetails(-1); this.selectedProvince = province.code; };
 				icon.onMouseRightPress = () => { this.displayContextualPanel(province.code); };
 				province.icon = icon;
 				province.icon.mouse_event_mask = "texture:campaigns/grand_strategy/provinces/" + province.code + ".png";
 			}
 			province.icon.size = this.toGUISize(...province.gfxdata.size);
+			const cityIcon = Engine.GetGUIObjectByName(province.icon.name.replace("Sprite", "City"));
+			if (province.ownerTribe)
+			{
+				const pos = province.getHeroPos();
+				//pos[0] -= province.icon.parent.size.top;
+				//pos[1] -= province.icon.parent.size.left;
+				cityIcon.size = this.toGUISize(...this.centeredSizeAt([12, 12], pos));
+				cityIcon.hidden = false;
+			}
+			else
+				cityIcon.hidden = true;
+
 			if (province.code === this.selectedProvince)
 				province.icon.sprite = `color:${province.getColor()} 100:stretched:textureAsMask:campaigns/grand_strategy/provinces/${province.code}.png`;
 			else if (province.ownerTribe)
@@ -217,21 +234,31 @@ class CampaignMenu
 		}
 
 		// Render event
-		let event = g_GameData.turnEvents && g_GameData.turnEvents[0];
-		if (event)
-		{
-			Engine.GetGUIObjectByName("eventPanel").hidden = false;
-			Engine.GetGUIObjectByName("eventPanelDesc").caption = event.type;
-			Engine.GetGUIObjectByName("eventPanelButton[0]").onPress = () => {
-				g_GameData.turnEvents.shift();
-				if (event.type === "attack")
-					g_GameData.playOutAttack(event.data.attacker, event.data.target);
-			};
-		}
-		else
-			Engine.GetGUIObjectByName("eventPanel").hidden = true;
+		const didRenderEvent = this.eventPanel.renderEvents(g_GameData.turnEvents);
 
-		Engine.GetGUIObjectByName("finishTurn").enabled = !!g_GameData && !g_GameData.turnEvents.length;
+		Engine.GetGUIObjectByName("finishTurn").enabled = !didRenderEvent && g_GameData?.canAdvanceTurn();
+
+		const delta = Date.now() - this.lastRender;
+		const SCROLL_SPEED = delta * 0.6;
+		if (this.mouseX < 10)
+			this.cameraX -= SCROLL_SPEED;
+		else if (this.mouseX >= this.window.getComputedSize().right - 10)
+			this.cameraX += SCROLL_SPEED;
+		if (this.mouseY < 10)
+			this.cameraZ -= SCROLL_SPEED;
+		else if (this.mouseY >= this.window.getComputedSize().bottom - 10)
+			this.cameraZ += SCROLL_SPEED;
+
+		this.lastRender = Date.now();
+	}
+
+	handleInputAfterGui(ev)
+	{
+		if (ev.type !== "mousemotion")
+			return false;
+		this.mouseX = ev.x;
+		this.mouseY = ev.y;
+		return true;
 	}
 
 	centeredSizeAt(size, pos)
@@ -246,6 +273,11 @@ class CampaignMenu
 
 	toGUISize(x0, z0, x1, z1)
 	{
-		return `${x0 - this.cameraX} ${z0 - this.cameraZ} ${x1 - this.cameraX} ${z1 - this.cameraZ}`;
+		return `${Math.round(x0 - this.cameraX)} ${Math.round(z0 - this.cameraZ)} ${Math.round(x1 - this.cameraX)} ${Math.round(z1 - this.cameraZ)}`;
 	}
+}
+
+function handleInputAfterGui(ev, hoveredObject)
+{
+	return g_CampaignMenu.handleInputAfterGui(ev, hoveredObject);
 }

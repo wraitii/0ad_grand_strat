@@ -1,3 +1,4 @@
+var g_CampaignMenu;
 
 function init(initData)
 {
@@ -10,8 +11,8 @@ function init(initData)
 			Engine.SwitchGuiPage("campaigns/grand_strategy/init/page.xml");
 			return;
 		}
-		const menu = new CampaignMenu(run);
-		menu.initialise();
+		g_CampaignMenu = new CampaignMenu(run);
+		g_CampaignMenu.initialise();
 	} catch (err) {
 		error(sprintf(translate("Error loading campaign run %s: %s."), CampaignRun.getCurrentRunFilename(), err));
 		error(err.stack.toString());

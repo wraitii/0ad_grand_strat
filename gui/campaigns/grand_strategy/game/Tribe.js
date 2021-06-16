@@ -57,4 +57,9 @@ class Tribe
 		if (idx !== -1)
 			this.controlledProvinces.splice(idx, 1);
 	}
+
+	getName()
+	{
+		return this.data.name;
+	}
 }

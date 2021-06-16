@@ -29,6 +29,11 @@ class Province
 
 	// UI
 
+	getName()
+	{
+		return this.data.name;
+	}
+
 	getColor()
 	{
 		if (this.ownerTribe)
@@ -42,7 +47,7 @@ class Province
 	getHeroPos()
 	{
 		if (this.data.centerpoint)
-			return this.data.centerpoint;
+			return clone(this.data.centerpoint);
 		return [(this.gfxdata.size[2] + this.gfxdata.size[0]) / 2,
 			(this.gfxdata.size[3] + this.gfxdata.size[1]) / 2];
 	}

@@ -11,6 +11,9 @@ class GSConquest extends GSEvent
 
 	getTickerText()
 	{
-		return sprintf("%(attacker)s has conquered %(target)s", this.data);
+		return sprintf("%(attacker)s has conquered %(target)s", {
+			"attacker": g_GameData.tribes[this.data.attacker].getName(),
+			"target": g_GameData.provinces[this.data.target].getName(),
+		});
 	}
 }

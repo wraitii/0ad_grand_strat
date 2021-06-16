@@ -1,0 +1,7 @@
+{
+	"code": "iber",
+	"name": "Iberians",
+	"civ": "iber",
+	"color": "100 140 140",
+	"startProvinces": ["andalusia"]
+}
