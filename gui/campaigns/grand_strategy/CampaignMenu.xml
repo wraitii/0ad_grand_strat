@@ -75,9 +75,13 @@
 
 			<!-- Contextual panel -->
 			<object name="contextPanel" size="0 0 250 200" hidden="true" type="image" sprite="campaignBackground">
-				<object name="contextPanelText" type="text" style="ModernLabelText" size="0 0 100% 100%" />
-				<object name="contextPanelButton[0]" type="button" style="StoneButtonFancy"
-					size="20 100%-40 100%-20 100%-12"/>
+				<object size="16 16 100%-16 100%-16">
+					<object name="contextPanelButton[0]" type="button" style="StoneButtonFancy"/>
+					<object name="contextPanelButton[1]" type="button" style="StoneButtonFancy"/>
+					<object name="contextPanelButton[2]" type="button" style="StoneButtonFancy"/>
+					<object name="contextPanelButton[3]" type="button" style="StoneButtonFancy"/>
+					<object name="contextPanelButton[4]" type="button" style="StoneButtonFancy"/>
+				</object>
 			</object>
 
 			<!-- Event panel -->
@@ -101,7 +105,6 @@
 					<translatableAttribute id="caption">Load / Save</translatableAttribute>
 				</object>
 			</object>
-
 
 			<object name="bottomPanel" size="30 100%-55 100%-5 100%-25" >
 				<object name="finishTurn" type="button" style="StoneButtonFancy" size="83%-25 0 100%-25 100%" enabled="false">

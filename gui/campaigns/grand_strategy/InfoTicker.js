@@ -10,6 +10,9 @@ class InfoTicker
 
 	initialise()
 	{
+		this.messages = [];
+		this.panelData.list = [];
+		this.panelData.list_data = [];
 		for (const i in g_GameData.pastTurnEvents)
 			this.processTurnEvents(g_GameData.pastTurnEvents[i], +i+1);
 	}

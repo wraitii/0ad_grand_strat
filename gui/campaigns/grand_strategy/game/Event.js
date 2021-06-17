@@ -1,4 +1,3 @@
-
 var g_GSEventId = 1;
 
 /**
@@ -6,8 +5,19 @@ var g_GSEventId = 1;
  */
 class GSEvent
 {
+	static GetStartEventID()
+	{
+		return g_GSEventId;
+	}
+	static SetStartEventID(id)
+	{
+		g_GSEventId = id;
+	}
+
 	constructor(type)
 	{
+		// This is a globally unique identifier - if something refers to a nevent with that ID,
+		// it's this event, and that's stable over time.
 		this.id = g_GSEventId++;
 		this.type = type;
 		this.data = {};
@@ -20,6 +30,14 @@ class GSEvent
 			return new GSConquest();
 		else if (data.type === "attack")
 			return new GSAttack();
+		else if (data.type === "insult")
+			return new GSInsult();
+		else if (data.type === "diploStatusChange")
+			return new GSDiploStatusChange();
+		else if (data.type === "peaceProposal")
+			return new GSPeaceProposal();
+		else if (data.type === "peaceAccepted")
+			return new GSPeaceAccepted();
 		error("Unknown event type " + data.type);
 		return undefined;
 	}
@@ -43,6 +61,21 @@ class GSEvent
 			this.processed = data.processed;
 		this.type = data.type;
 		this.data = data.data;
+	}
+
+	/**
+	 * Private method - warn if methods are missing in data, assuming data is defined
+	 */
+	_check(...args)
+	{
+		if (this.data)
+			for (const k of args)
+				if (!(k in this.data))
+				{
+					warn(`Event ${this.id} of type ${this.type} is missing ${k}`);
+					return false;
+				}
+		return true;
 	}
 
 	/**

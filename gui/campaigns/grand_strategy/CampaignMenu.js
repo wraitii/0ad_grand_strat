@@ -84,7 +84,7 @@ class CampaignMenu
 	{
 		const pos = g_GameData.provinces[g_GameData.playerHero.location].getHeroPos();
 		this.cameraX = pos[0] - this.window.getComputedSize().right/2;
-		this.cameraZ = pos[1] - this.window.getComputedSize().bottom/2;		
+		this.cameraZ = pos[1] - this.window.getComputedSize().bottom/2;
 	}
 
 	/**
@@ -139,10 +139,19 @@ class CampaignMenu
 		}
 		Engine.GetGUIObjectByName("tribeDetails").hidden = false;
 
-		let tribe = g_GameData.tribes[tribeCode];
+		const tribe = g_GameData.tribes[tribeCode];
+
+		let diploStr = "";
+		if (tribeCode !== g_GameData.playerTribe)
+		{
+			const diplo = tribe.getDiplomacy(g_GameData.playerTribe);
+			diploStr = `Opinion: ${diplo.opinion}\nStatus: ${diplo.status}`;
+		}
+
 		Engine.GetGUIObjectByName("tribeDetailsText").caption = `` +
 		`Name: ${tribe.data.name}\n` +
 		`Money: ${tribe.money}\n` +
+		`Diplo: ${diploStr}\n` +
 		``;
 
 		Engine.GetGUIObjectByName("goToProvinceButton").onPress = () => {
@@ -180,13 +189,38 @@ class CampaignMenu
 		Engine.GetGUIObjectByName("contextPanel").size = this.toGUISize(...pos, pos[0] + 250, pos[1] + 200);
 		Engine.GetGUIObjectByName("contextPanel").hidden = false;
 
+		// Move there button.
 		Engine.GetGUIObjectByName("contextPanelButton[0]").enabled = g_GameData.playerHero.canMove(code) &&
 			code !== g_GameData.playerHero.location;
 		Engine.GetGUIObjectByName("contextPanelButton[0]").onPress = () => {
 			g_GameData.playerHero.doMove(code);
 			this.displayContextualPanel(-1);
 		};
-		Engine.GetGUIObjectByName("contextPanelButton[0]").caption="Move there"
+		Engine.GetGUIObjectByName("contextPanelButton[0]").caption = "Move there";
+		if (!g_GameData.provinces[code].ownerTribe || g_GameData.provinces[code].ownerTribe === g_GameData.playerTribe)
+		{
+			for (let i = 1; i < 5; ++i)
+				Engine.GetGUIObjectByName("contextPanelButton[0]").hidden = true;
+		}
+		else
+		{
+			const actions = g_GameData.tribes[g_GameData.playerTribe].getDiplomacy(g_GameData.provinces[code].ownerTribe).getActions();
+			let i = 1;
+			for (const key in actions)
+			{
+				Engine.GetGUIObjectByName(`contextPanelButton[${i}]`).enabled = actions[key];
+				Engine.GetGUIObjectByName(`contextPanelButton[${i}]`).hidden = false;
+				Engine.GetGUIObjectByName(`contextPanelButton[${i}]`).onPress = () => {
+					this.displayContextualPanel(-1);
+					const ev = g_GameData.tribes[g_GameData.playerTribe].getDiplomacy(g_GameData.provinces[code].ownerTribe)[key]();
+					g_GameData.pushTurnEvent(ev);
+				};
+				Engine.GetGUIObjectByName(`contextPanelButton[${i}]`).caption = key;
+				++i;
+			}
+		}
+		for (let i = 0; i < 5; ++i)
+			Engine.GetGUIObjectByName(`contextPanelButton[${i}]`).size = `0 ${i*28} 100% ${(i+1)*28}`;
 	}
 
 	render()

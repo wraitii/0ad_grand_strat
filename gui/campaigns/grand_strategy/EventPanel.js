@@ -49,6 +49,8 @@ class EventPanel
 			return true;
 		}
 		const nb = buttonData.length;
+		for (let i = nb; i < this.buttons.length; ++i)
+			this.buttons[i].hidden = true;
 		for (const bd in buttonData)
 		{
 			this.buttons[bd].caption = buttonData[bd].caption;

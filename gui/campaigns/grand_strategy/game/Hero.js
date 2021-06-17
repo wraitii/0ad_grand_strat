@@ -34,7 +34,11 @@ class Hero
 
 	canMove(code)
 	{
-		if (!g_GameData.provinces[code].canTravel(this.location))
+		const target = g_GameData.provinces[code];
+		if (!target.canTravel(this.location))
+			return false;
+		if (target.ownerTribe && !this.ownsProvince(code) &&
+			g_GameData.tribes[this.tribe].getDiplomacy(target.ownerTribe).status !== GSDiplomacy.prototype.WAR)
 			return false;
 		return this.actionsLeft >= 1;
 	}

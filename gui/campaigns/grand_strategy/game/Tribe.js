@@ -19,6 +19,8 @@ class Tribe
 
 		this.money = 0;
 		this.lastBalance = 0;
+
+		this.diplo = {};
 	}
 
 	Serialize()
@@ -27,6 +29,7 @@ class Tribe
 			"money": this.money,
 			"lastBalance": this.lastBalance || 0,
 			"civ": this.civ,
+			"diplo": Object.keys(this.diplo).map(x => [x, this.diplo[x].serialize()]),
 		};
 		if (this.customTribeData)
 			ret.customTribeData = this.customTribeData;
@@ -43,6 +46,14 @@ class Tribe
 		for (const prov in g_GameData.provinces)
 			if (g_GameData.provinces[prov].ownerTribe === this.code)
 				this.controlledProvinces.push(prov);
+
+		for (const [key, diplo] of data.diplo)
+			this.diplo[key] = new GSDiplomacy(this.code, key).deserialize(diplo);
+	}
+
+	getName()
+	{
+		return this.data.name;
 	}
 
 	GainControl(code)
@@ -58,8 +69,27 @@ class Tribe
 			this.controlledProvinces.splice(idx, 1);
 	}
 
-	getName()
+	/**
+	 * Whether the tribe can attack the target.
+	 * Always true if target is undefined (barbarians).
+	 */
+	canAttack(target)
 	{
-		return this.data.name;
+		if (!target)
+			return true;
+		return this.getDiplomacy(target).canAttack();
+	}
+
+	getDiplomacy(target)
+	{
+		if (target === this.code)
+		{
+			warn("Cannot get diplomacy with ourselves");
+			return undefined;
+		}
+		// Diplomacy is lazily constructed for efficiency - things start out neutral.
+		if (!this.diplo[target])
+			this.diplo[target] = new GSDiplomacy(this.code, target);
+		return this.diplo[target];
 	}
 }

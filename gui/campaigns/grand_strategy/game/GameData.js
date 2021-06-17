@@ -50,7 +50,8 @@ class GameData
 			"difficulty": this.difficulty,
 			"tribes": tribes,
 			"provinces": pv,
-			"events": pastEvents
+			"events": pastEvents,
+			"lastEventID": GSEvent.GetStartEventID(),
 		};
 	}
 
@@ -91,6 +92,8 @@ class GameData
 		}
 		if (this.pastTurnEvents.length)
 			this.turnEvents = this.pastTurnEvents[this.pastTurnEvents.length - 1];
+		// Reset after as we incremented un-necessarily for a while.
+		GSEvent.SetStartEventID(data.lastEventID);
 	}
 
 	static createNewGame(playerData, difficulty)
@@ -291,7 +294,7 @@ class GameData
 
 		--this.turnI;
 
-		if (this.turnI === 2)
+		if (this.turnI === 24)
 		{
 			// Grant 100 Money for each owned province.
 			for (let tribeCode in this.tribes)
@@ -306,28 +309,78 @@ class GameData
 				// TODO: nasty events if in debt, possibly losing the game.
 			}
 		}
-		else if (this.turnI === 1)
+		else if (this.turnI === 5)
 		{
-			// Tribe '''AI'''
-			for (let code in this.tribes)
+			// Tribe '''AI''' - regular stuff & diplomacy.
+			for (const code in this.tribes)
 			{
 				if (code === this.playerTribe)
 					continue;
-				let tribe = this.tribes[code];
-				let targets = new Set();
-				for (let prov of tribe.controlledProvinces)
+				const tribe = this.tribes[code];
+				const neighbors = new Set();
+				for (const prov of tribe.controlledProvinces)
 				{
-					const pv = g_GameData.provinces[prov];
+					const pv = this.provinces[prov];
+					// TODO: do this elsewhere
 					if (pv.garrison < 2)
 						pv.garrison++;
-					for (let pot of pv.getLinks())
-						if (g_GameData.provinces[pot].ownerTribe !== code)
-							targets.add(pot);
+					for (const pot of pv.getLinks())
+						if ((this.provinces[pot].ownerTribe || code) !== code)
+							neighbors.add(this.provinces[pot].ownerTribe);
+				}
+				for (const neighb of neighbors)
+				{
+					const diplo = tribe.getDiplomacy(neighb);
+					let ev;
+					if (diplo.status === diplo.PEACE)
+					{
+						// Go hostile then to war
+						if (diplo.opinion < -30 && randBool(0.33))
+							ev = diplo.goHostile();
+						// Randomly decide we don't like some people.
+						// (NB: this will end up being _all_ people after a while)
+						else if (diplo.opinion > -30 && randBool(0.2))
+							ev = diplo.insult();
+					}
+					// Every turn 50% chance of hostility breaking out into war.
+					else if (diplo.status === diplo.HOSTILE && randBool(0.5))
+						ev = diplo.declareWar();
+					// else 10% chance of going at war
+					else if (diplo.status === diplo.WAR && randBool(0.1))
+						ev = diplo.proposePeace();
+					if (ev)
+						this.turnEvents.push(ev);
+				}
+			}
+		}
+		else if (this.turnI === 4)
+		{
+			// Tribe '''AI''' - Response to diplomacy events.
+			for (const ev of this.turnEvents)
+				if (ev.data.target && ev.data.from)
+					pickRandom(this.tribes[ev.data.target]?.getDiplomacy(ev.data.from).getResponses(ev))?.action?.();
+		}
+		else if (this.turnI === 1)
+		{
+			// Tribe '''AI''' - Invasions.
+			for (const code in this.tribes)
+			{
+				if (code === this.playerTribe)
+					continue;
+				const tribe = this.tribes[code];
+				const targets = new Set();
+				for (const prov of tribe.controlledProvinces)
+				{
+					const pv = this.provinces[prov];
+					for (const pot of pv.getLinks())
+						if (this.provinces[pot].ownerTribe !== code)
+							if (tribe.canAttack(this.provinces[pot].ownerTribe))
+								targets.add(pot);
 				}
 				if (randBool(0.5) && targets.size)
 				{
-					let target = pickRandom(Array.from(targets));
-					let province = g_GameData.provinces[target];
+					const target = pickRandom(Array.from(targets));
+					const province = this.provinces[target];
 					if (province.ownerTribe === this.playerTribe)
 					{
 						this.turnEvents.push(new GSAttack({
@@ -379,6 +432,19 @@ class GameData
 			ev.processed = true;
 			return;
 		}
+	}
+
+	/**
+	 * Call this when creating an event for the current turn.
+	 * (this effectively makes it so the player plays last).
+	 */
+	pushTurnEvent(event)
+	{
+		this.turnEvents.push(event);
+		if (event.data.target !== this.playerTribe)
+			pickRandom(g_GameData.tribes[event.data.target]?.getDiplomacy(event.data.from).getResponses(event))?.action?.();
+		// TODO: unhack this
+		g_CampaignMenu.infoTicker.initialise();
 	}
 
 	canAdvanceTurn()
