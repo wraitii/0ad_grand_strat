@@ -4,6 +4,9 @@ This repo, unless specified otherwise, is `GPL-2.0`, like 0 A.D. - I intend to m
 
 ### Specifics:
 
+Images & other art (not JSON / XML data) files in `art/` are CC0.
+
 Both [World_in_300_BCE](https://commons.wikimedia.org/wiki/File:World_in_300_BCE.PNG)/ [World_in_323_BCE](https://commons.wikimedia.org/wiki/File:World_in_323_BCE.png) come from Wikipedia and are CC-BY-SA 3.0.
 
 The base map and derived files in `working_data` are taken from https://maps-for-free.com/ which is CC0.
+
