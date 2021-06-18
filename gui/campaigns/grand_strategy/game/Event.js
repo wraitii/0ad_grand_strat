@@ -16,7 +16,7 @@ class GSEvent
 
 	constructor(type)
 	{
-		// This is a globally unique identifier - if something refers to a nevent with that ID,
+		// This is a globally unique identifier - if something refers to an event with that ID,
 		// it's this event, and that's stable over time.
 		this.id = g_GSEventId++;
 		this.type = type;

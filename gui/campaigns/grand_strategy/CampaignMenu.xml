@@ -53,9 +53,6 @@
 					<translatableAttribute id="caption">Province Details</translatableAttribute>
 				</object>
 				<object name="provinceDetailsText" type="text" style="ModernLabelText" size="0 40 100% 100%" />
-				<object name="doMove" type="button" style="StoneButtonFancy" size="20 100%-40 100%-20 100%-12" enabled="false">
-					<translatableAttribute id="caption">Move to province</translatableAttribute>
-				</object>
 				<object type="button" name="provinceOwnerButton" sprite="stretched:session/portraits/emblems/emblem_persians.png" size="100%-70 10 100%-10 70"/>
 			</object>
 

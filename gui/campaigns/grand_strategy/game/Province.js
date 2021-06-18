@@ -37,11 +37,11 @@ class Province
 	getColor()
 	{
 		if (this.ownerTribe)
-			return g_GameData.tribes[this.ownerTribe].color;
+			return g_GameData.tribes[this.ownerTribe].color.split(" ");
 		const r = Math.floor(this.data.hash / 1000000);
 		const g = Math.floor((this.data.hash - r * 1000000) / 1000);
 		const b = Math.floor((this.data.hash - r * 1000000 - g * 1000));
-		return `${r} ${g} ${b}`;
+		return [r, g, b];
 	}
 
 	getHeroPos()
@@ -60,6 +60,19 @@ class Province
 	getNativeCivs()
 	{
 		return this.data.civs ?? ["random"];
+	}
+
+	getInfoLevel(tribe)
+	{
+		if (this.ownerTribe === tribe)
+			return 2;
+		else if (tribe === g_GameData.playerTribe)
+		{
+			const links = this.getLinks();
+			if (this.code === g_GameData.playerHero.location || links.indexOf(g_GameData.playerHero.location) !== -1)
+				return 1;
+		}
+		return 0;
 	}
 
 	// Game
